@@ -208,15 +208,6 @@
   border-radius: 0;
 }
 
-.bottom-bar {
-  height: auto;
-  padding: 10px 0 12px;
-}
-
-.bottom-buttons {
-  grid-template-columns: 1fr;
-}
-
 /* Tablet: 768px - 1023px */
 @media (min-width: 768px) and (max-width: 1023px) {
   .stage {
@@ -244,9 +235,6 @@
     padding: 28px 26px 20px;
   }
 
-  .bottom-buttons {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 /* PC: >= 1024px */
@@ -288,15 +276,6 @@
     max-height: 520px;
     padding: 32px 36px 28px;
     border-radius: 28px;
-  }
-
-  .bottom-bar {
-    height: auto;
-    padding: 8px 0 10px;
-  }
-
-  .bottom-buttons {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .legend {
