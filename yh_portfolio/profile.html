@@ -42,14 +42,6 @@
       </article>
 
       <div class="center-placeholder" aria-hidden="true"></div>
-
-      <div class="right-buttons-area">
-        <div class="right-buttons" id="rightButtons">
-          <a class="nav-button" href="portfolio.html">ポートフォリオ (Portfolio) を見る</a>
-          <a class="nav-button" href="skills.html">スキル (Skills) を見る</a>
-          <a class="nav-button" href="contact.html">お問い合わせ (Contact) へ</a>
-        </div>
-      </div>
     </div>
 
         <footer class="bottom-bar" aria-label="ボトムバー">
@@ -76,7 +68,6 @@
     const panelNote = document.getElementById('panelNote');
     const closeBtn = document.getElementById('closeBtn');
     const dim = document.getElementById('dim');
-    const rightButtons = document.getElementById('rightButtons');
 
     const sections = [
       {
@@ -207,8 +198,6 @@
       panel.setAttribute('aria-hidden', 'false');
       panel.classList.add('active');
       dim.classList.add('visible');
-      rightButtons.style.opacity = '0';
-      rightButtons.style.pointerEvents = 'none';
     };
 
     const closePanel = () => {
@@ -221,8 +210,6 @@
       dim.classList.remove('visible');
       instruction.style.opacity = '1';
       instruction.style.transform = 'scale(1)';
-      rightButtons.style.opacity = '1';
-      rightButtons.style.pointerEvents = 'auto';
     };
 
     closeBtn.addEventListener('click', closePanel);

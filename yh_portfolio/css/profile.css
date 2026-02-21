@@ -130,11 +130,6 @@
       box-shadow: 0 8px 18px rgba(240, 124, 44, 0.22);
     }
 
-    .right-buttons,
-.right-buttons {
-      width: 300px;
-      transform: translateX(-200px);
-    }
 .main-background-dim {
       position: absolute;
       inset: 0;
@@ -150,18 +145,6 @@
       pointer-events: auto;
     }
 
-    .right-buttons-area {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 300px;
-      height: 650px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-    }
 .legend {
       position: absolute;
       bottom: 18px;
