@@ -4,7 +4,8 @@ body {
 
 /* main は 650px（910 - header90 - bottom170 = 650） */
     .main{
-      height: min(650px, 100%);
+      height: 100%;
+      min-height: 0;
       padding: 12px 20px 8px;
       display: flex;
       justify-content: center;
@@ -14,7 +15,9 @@ body {
 
     .skills-wrap{
       width: 1200px;
-      height: 650px;
+      height: 100%;
+      max-height: 650px;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center; /* 縦中央寄せ */
