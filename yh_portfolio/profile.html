@@ -230,7 +230,7 @@
       donutArea.style.setProperty('--donut-size', `${side}px`);
 
       // Center helper circle tracks donut size and never exceeds it.
-      const instructionSize = Math.max(64, Math.floor(side * 0.34));
+      const instructionSize = Math.min(Math.floor(side * 0.6), Math.max(72, Math.floor(side * 0.4)));
       donutArea.style.setProperty('--instruction-size', `${Math.min(instructionSize, side)}px`);
     };
 
