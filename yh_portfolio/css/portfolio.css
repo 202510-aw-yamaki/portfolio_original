@@ -131,11 +131,6 @@ body {
       transform: translateY(0);
       box-shadow: 0 8px 18px rgba(240, 124, 44, 0.22);
     }
-.right-buttons {
-      flex-direction: row;
-      justify-content: center;
-      padding: 0 32px;
-    }
 .main-background-dim {
       position: absolute;
       inset: 0;
@@ -151,20 +146,6 @@ body {
       pointer-events: auto;
     }
 
-    .right-buttons-area {
-      padding: 24px 10px 24px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      z-index: 3;
-    }
-
-    /* 右の3ボタンを左寄せにシフト */
-    .right-buttons {
-      width: 300px;
-      transform: translateX(-200px);
-    }
 .donut .segment {
       transition: filter 0.2s ease, transform 0.2s ease, fill 0.25s ease, stroke 0.2s ease;
       cursor: pointer;
@@ -270,23 +251,6 @@ body {
   pointer-events: none; /* 本以外は背面クリックを阻害しない */
 }
 
-.stage[aria-label="ポートフォリオリンク掲載ページ"] .right-buttons-area {
-  /* 右カードは背面に残す（本が上にかぶさってOK） */
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 650px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
-    .right-buttons-area {
-      z-index: 2; /* 本UIの背面 */
-    }
 
     .book {
   /* 指定：
