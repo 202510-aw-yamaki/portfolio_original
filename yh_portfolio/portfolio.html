@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ポートフォリオ（リンク掲載ページ・見開き1300×高さ630版）</title>
+  <title>YH Portfolio - ポートフォリオ</title>
   <link rel="stylesheet" href="css/common.css" />
   <link rel="stylesheet" href="css/portfolio.css" />
 </head>
 <body>
-  <div class="stage" aria-label="ポートフォリオリンク掲載ページ">
+  <div class="stage" aria-label="ポートフォリオページ">
     <header>
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">
@@ -25,23 +25,22 @@
     </header>
 
     <div class="main" role="main">
-      <section class="book-area" aria-label="ポートフォリオ 本（Book）">
+      <section class="book-area" aria-label="ポートフォリオ本">
         <div class="book" id="book" data-state="cover">
-          <button class="bookmark" id="bookmarkBtn" type="button" aria-label="一覧へ（Bookmark）を開く">一覧へ</button>
+          <button class="bookmark" id="bookmarkBtn" type="button" aria-label="一覧を開く">一覧へ</button>
 
-          <div class="cover" id="cover" role="group" aria-label="表紙（注目3作品）">
+          <div class="cover" id="cover" role="group" aria-label="表紙">
             <div class="cover-title">
               <h1>PORTFOLIO</h1>
-              <div class="subtitle">状態A：表紙（注目3作品）</div>
+              <div class="subtitle">表紙 / 注目3作品</div>
             </div>
 
-            <div class="featured-list" id="featuredList" aria-label="注目3作品 一覧">
-              <!-- JSで描画（作品名＋簡易説明：最大3行） -->
+            <div class="featured-list" id="featuredList" aria-label="注目3作品">
             </div>
 
             <div class="cover-hint" aria-hidden="true">
-              <span>作品行クリック：詳細へ（ページめくり演出）</span>
-              <span class="arrow">▶ 一覧へ：一覧へ</span>
+              <span>作品を選択すると詳細へ移動します</span>
+              <span class="arrow">▶ 一覧へ</span>
             </div>
           </div>
 
@@ -50,33 +49,26 @@
 
             <div class="page" role="group" aria-label="左ページ">
               <div class="page-header">
-                <h2 id="leftTitle">状態B：見開き一覧（最大6作品）</h2>
-                <button class="mini-btn" id="toCoverBtn" type="button">表紙へ戻る</button>
+                <h2 id="leftTitle">見開き一覧</h2>
+                <button class="mini-btn" id="toCoverBtn" type="button" aria-label="表紙へ戻る">表紙へ戻る</button>
               </div>
-
-              <div id="spreadLeft">
-                <!-- JSで描画（作品カード：最大6件） -->
-              </div>
+              <div id="spreadLeft"></div>
             </div>
 
             <div class="page" id="rightPage" role="group" aria-label="右ページ">
               <div class="page-header">
                 <h2 id="rightTitle">状態説明</h2>
-                <button class="mini-btn" id="toSpreadBtn" type="button">一覧へ戻る</button>
+                <button class="mini-btn" id="toSpreadBtn" type="button" aria-label="一覧へ戻る">一覧へ戻る</button>
               </div>
-
-              <div id="spreadRight">
-                <!-- JSで描画（詳細ページ／補足など） -->
-              </div>
+              <div id="spreadRight"></div>
             </div>
           </div>
         </div>
       </section>
-
       <div class="center-placeholder" aria-hidden="true"></div>
     </div>
 
-        <footer class="bottom-bar" aria-label="ボトムバー">
+    <footer class="bottom-bar" aria-label="ボトムバー">
       <div class="bottom-buttons">
         <a class="footer-card" href="profile.html" aria-hidden="false" tabindex="0">プロフィール (Profile)</a>
         <a class="footer-card is-current" href="portfolio.html" aria-hidden="true" tabindex="-1">ポートフォリオ (Portfolio)</a>
@@ -86,18 +78,7 @@
     </footer>
   </div>
 
-
   <script>
-    /**
-     * ポートフォリオリンク掲載ページ：状態制御
-     * - 状態A：表紙（注目3作品）
-     * - 状態B：見開き一覧（最大6作品）
-     * - 状態C：作品詳細ページ
-     *
-     * ※リンク先ページ／ダウンロードリンクは現段階で未作成のため、後工程でここにURLを記述する。
-     *   - works[].pageUrl     : 作品ページURL（任意）
-     *   - works[].downloadUrl : ダウンロードURL（任意）
-     */
     const book = document.getElementById('book');
     const featuredList = document.getElementById('featuredList');
     const spreadLeft = document.getElementById('spreadLeft');
@@ -109,282 +90,194 @@
     const bookmarkBtn = document.getElementById('bookmarkBtn');
     const toCoverBtn = document.getElementById('toCoverBtn');
     const toSpreadBtn = document.getElementById('toSpreadBtn');
-    const spreadNavDuration = 650;
-    let spreadNavigationInFlight = false;
 
-    // 表紙→見開き演出に関係する識別子（見開き→他ページでは使用しない）
-    // クラス: is-turning / is-page-turning
-    // キーフレーム: pageTurn / curlShade / pageTurnSoft / curlShadeSoft
-    // JS: turnAnimation()
-
-    // 仮データ（後工程で差し替え）
     const works = [
       {
         id: 'work-01',
         title: '作品A（仮）',
-        short: '短い説明（仮）。どんな課題をどう解いたかを一言で。',
-        tags: ['カテゴリ：UI', '役割：設計'],
-        detail:
-`ここに作品の詳細説明を記述します（仮）。
-・背景 / 課題
-・対応内容
-・工夫点
-・結果 / 学び
-（後工程で実データに差し替え）`,
-        // TODO: 作品ページURL（任意）をここに記述
+        short: 'UI改善を中心に、導線整理と視認性向上を行った事例です。',
+        tags: ['UI', '設計'],
+        detail: '背景・課題\n- 複数導線で離脱率が高い状態\n\n対応\n- 画面構成の再設計\n- 操作導線を2ステップに集約\n\n結果\n- 初回操作完了率が向上',
         pageUrl: '',
-        // TODO: ダウンロードURL（任意）をここに記述
         downloadUrl: ''
       },
       {
         id: 'work-02',
         title: '作品B（仮）',
-        short: '短い説明（仮）。3行以内で要点をまとめる。',
-        tags: ['カテゴリ：Web', '役割：実装'],
-        detail:
-`ここに作品の詳細説明を記述します（仮）。
-（後工程で実データに差し替え）`,
-        // TODO: 作品ページURL（任意）をここに記述
+        short: '管理画面のモバイル最適化を行い、現場運用負荷を低減しました。',
+        tags: ['Web', '実装'],
+        detail: '背景・課題\n- PC前提UIでスマホ運用が困難\n\n対応\n- ブレークポイント再設計\n- 優先操作の常時表示\n\n結果\n- モバイル操作時間を短縮',
         pageUrl: '',
-        // TODO: ダウンロードURL（任意）をここに記述
         downloadUrl: ''
       },
       {
         id: 'work-03',
         title: '作品C（仮）',
-        short: '短い説明（仮）。想定ユーザーと目的が伝わる書き方に。',
-        tags: ['カテゴリ：資料', '役割：構成'],
-        detail:
-`ここに作品の詳細説明を記述します（仮）。
-（後工程で実データに差し替え）`,
-        // TODO: 作品ページURL（任意）をここに記述
+        short: '情報量の多い画面を整理し、意思決定しやすいUIに改善しました。',
+        tags: ['業務', '分析'],
+        detail: '背景・課題\n- 一画面の情報が多く判断しづらい\n\n対応\n- 情報階層の定義\n- 重要情報を上段固定\n\n結果\n- 判断時間を短縮',
         pageUrl: '',
-        // TODO: ダウンロードURL（任意）をここに記述
         downloadUrl: ''
       },
       {
         id: 'work-04',
         title: '作品D（仮）',
-        short: '短い説明（仮）。',
-        tags: ['カテゴリ：UI'],
-        detail:
-`ここに作品の詳細説明を記述します（仮）。`,
-        // TODO: 作品ページURL（任意）をここに記述
+        short: 'デザインシステム導入に向けたコンポーネント整備を実施しました。',
+        tags: ['UI', '標準化'],
+        detail: '背景・課題\n- 画面ごとに部品仕様が不統一\n\n対応\n- 共通部品ルール策定\n- 実装規約整備\n\n結果\n- 開発とレビューの速度向上',
         pageUrl: '',
-        // TODO: ダウンロードURL（任意）をここに記述
         downloadUrl: ''
       },
       {
         id: 'work-05',
         title: '作品E（仮）',
-        short: '短い説明（仮）。',
-        tags: ['カテゴリ：Web'],
-        detail:
-`ここに作品の詳細説明を記述します（仮）。`,
-        // TODO: 作品ページURL（任意）をここに記述
+        short: 'フォーム導線の見直しで入力完了率を改善した事例です。',
+        tags: ['Web', 'CV改善'],
+        detail: '背景・課題\n- 入力途中離脱が多い\n\n対応\n- 入力項目の削減\n- エラー表示の即時化\n\n結果\n- 完了率改善',
         pageUrl: '',
-        // TODO: ダウンロードURL（任意）をここに記述
         downloadUrl: ''
       },
       {
         id: 'work-06',
         title: '作品F（仮）',
-        short: '短い説明（仮）。',
-        tags: ['カテゴリ：資料'],
-        detail:
-`ここに作品の詳細説明を記述します（仮）。`,
-        // TODO: 作品ページURL（任意）をここに記述
+        short: '運用チーム向けに手順を整理し、更新作業の属人化を解消しました。',
+        tags: ['運用', '改善'],
+        detail: '背景・課題\n- 担当者依存で更新品質にばらつき\n\n対応\n- 手順書整備\n- テンプレート化\n\n結果\n- 作業品質の安定化',
         pageUrl: '',
-        // TODO: ダウンロードURL（任意）をここに記述
         downloadUrl: ''
       }
     ];
 
-    const featured = ['work-01', 'work-02', 'work-03']; // 表紙：注目3作品
+    const featured = ['work-01', 'work-02', 'work-03'];
 
     function setState(next) {
       book.setAttribute('data-state', next);
     }
 
-    function clearLegacyNavigationState() {
-      book.classList.remove('is-navigating');
-    }
-
     function turnAnimation(fn, kind = 'cover') {
-      const coverDur = 1100;
-      const innerDur = 1350;
-      const isInner = (kind === 'inner');
+      const coverDur = 500;
+      const innerDur = 500;
+      const isInner = kind === 'inner';
       const cls = isInner ? 'is-page-turning' : 'is-turning';
       const dur = isInner ? innerDur : coverDur;
+      const switchDelay = 220;
 
-      // 連打・状態切替のズレ防止
       book.classList.remove('is-turning', 'is-page-turning');
+      void book.offsetWidth;
       book.classList.add(cls);
 
       window.setTimeout(() => {
         fn();
         window.setTimeout(() => book.classList.remove(cls), dur + 60);
-      }, 10);
+      }, switchDelay);
     }
-
 
     function renderCover() {
       setState('cover');
-      clearLegacyNavigationState();
       toSpreadBtn.style.visibility = 'hidden';
       featuredList.innerHTML = '';
+
       featured.forEach((id) => {
-        const w = works.find(x => x.id === id);
+        const w = works.find((x) => x.id === id);
+        if (!w) return;
         const row = document.createElement('div');
         row.className = 'featured-item';
         row.setAttribute('role', 'button');
         row.setAttribute('tabindex', '0');
-        row.innerHTML = `
-          <div class="title">${escapeHtml(w.title)}</div>
-          <div class="desc">${escapeHtml(w.short)}</div>
-        `;
-        row.addEventListener('click', () => {
-          turnAnimation(() => renderDetail(w.id, 'cover'), 'cover');
-        });
+        row.innerHTML = `<div class="title">${escapeHtml(w.title)}</div><div class="desc">${escapeHtml(w.short)}</div>`;
+        row.addEventListener('click', () => turnAnimation(() => renderDetail(w.id), 'cover'));
         row.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            turnAnimation(() => renderDetail(w.id, 'cover'), 'cover');
+            turnAnimation(() => renderDetail(w.id), 'cover');
           }
         });
         featuredList.appendChild(row);
       });
 
-      // 表紙では「一覧へ戻る」ボタンは実質不要だが、状態統一のため残す
+      leftTitle.textContent = '見開き一覧';
       rightTitle.textContent = '状態説明';
       spreadLeft.innerHTML = '';
       spreadRight.innerHTML = `
         <div class="detail">
-          <p>
-表紙（状態A）では、注目3作品を縦並び表示します。
-作品行クリックで詳細（状態C）へ遷移します。
-一覧へ（Bookmark）クリックで一覧（状態B）へ遷移します。
-          </p>
+          <p>表紙では注目3作品を表示します。作品を選択すると詳細へ移動します。</p>
+          <p>「一覧へ」ボタンを押すと、見開き一覧（最大6作品）に遷移します。</p>
         </div>
       `;
     }
 
-    
     function renderSpread() {
       setState('spread');
-      clearLegacyNavigationState();
+      toSpreadBtn.style.visibility = 'hidden';
 
-      // 見開き一覧は左右ページ合計で最大6件（運用で6件超にしない）
-      const max = 6;
-      const list = works.slice(0, max);
+      const list = works.slice(0, 6);
       const leftItems = list.slice(0, 3);
       const rightItems = list.slice(3, 6);
 
-      leftTitle.textContent = '状態B：見開き一覧（最大6作品）';
-      rightTitle.textContent = '状態B：見開き一覧（最大6作品）';
+      leftTitle.textContent = '見開き一覧（最大6作品）';
+      rightTitle.textContent = '見開き一覧（最大6作品）';
 
-      // 一覧中は「一覧へ戻る」ボタンは不要なので非表示（表紙へ戻るは左ページ上部に残す）
-      toSpreadBtn.style.visibility = 'hidden';
+      spreadLeft.innerHTML = `<div class="spread-list" aria-label="左ページ作品一覧">${leftItems.map((w) => spreadItemHtml(w)).join('')}</div>`;
+      spreadRight.innerHTML = rightItems.length
+        ? `<div class="spread-list" aria-label="右ページ作品一覧">${rightItems.map((w) => spreadItemHtml(w)).join('')}</div>`
+        : `<div class="detail"><p>右ページに表示する作品はありません。</p></div>`;
 
-      spreadLeft.innerHTML = `
-        <div class="spread-list" aria-label="見開き一覧（左ページ）">
-          ${leftItems.map(w => `
-            <div class="spread-item" role="button" tabindex="0" data-id="${w.id}">
-              <div class="title">${escapeHtml(w.title)}</div>
-              <div class="desc">${escapeHtml(w.short)}</div>
-              ${w.tags?.length ? `
-                <div class="chips" aria-label="タグ（任意）">
-                  ${w.tags.slice(0, 2).map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
-                </div>
-              ` : ``}
-            </div>
-          `).join('')}
-        </div>
-      `;
-
-      spreadRight.innerHTML = rightItems.length ? `
-        <div class="spread-list" aria-label="見開き一覧（右ページ）">
-          ${rightItems.map(w => `
-            <div class="spread-item" role="button" tabindex="0" data-id="${w.id}">
-              <div class="title">${escapeHtml(w.title)}</div>
-              <div class="desc">${escapeHtml(w.short)}</div>
-              ${w.tags?.length ? `
-                <div class="chips" aria-label="タグ（任意）">
-                  ${w.tags.slice(0, 2).map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
-                </div>
-              ` : ``}
-            </div>
-          `).join('')}
-        </div>
-      ` : `
-        <div class="detail" aria-label="空きページ">
-          <p>（作品が3件以下のため、右ページは空き領域です。）</p>
-        </div>
-      `;
-
-      // クリック / キーボード（Enter/Space）で詳細へ
-      const bind = (root) => {
-        root.querySelectorAll('[data-id]').forEach((el) => {
-          const id = el.getAttribute('data-id');
-          el.addEventListener('click', () => turnAnimation(() => renderDetail(id, 'spread'), 'inner'));
-          el.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              turnAnimation(() => renderDetail(id, 'spread'), 'inner');
-            }
-          });
-        });
-      };
-      bind(spreadLeft);
-      bind(spreadRight);
+      bindSpreadItems(spreadLeft);
+      bindSpreadItems(spreadRight);
     }
 
-    
-    function renderDetail(workId, from) {
-      setState('detail');
-      clearLegacyNavigationState();
-      const w = works.find(x => x.id === workId);
+    function spreadItemHtml(w) {
+      return `
+        <div class="spread-item" role="button" tabindex="0" data-id="${w.id}">
+          <div class="title">${escapeHtml(w.title)}</div>
+          <div class="desc">${escapeHtml(w.short)}</div>
+          <div class="chips" aria-label="タグ">${w.tags.slice(0, 2).map((t) => `<span class="chip">${escapeHtml(t)}</span>`).join('')}</div>
+        </div>
+      `;
+    }
 
-      // 詳細表示中は「一覧へ戻る」ボタンを表示（右ページ上部）
+    function bindSpreadItems(root) {
+      root.querySelectorAll('[data-id]').forEach((el) => {
+        const id = el.getAttribute('data-id');
+        el.addEventListener('click', () => turnAnimation(() => renderDetail(id), 'inner'));
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            turnAnimation(() => renderDetail(id), 'inner');
+          }
+        });
+      });
+    }
+
+    function renderDetail(workId) {
+      const w = works.find((x) => x.id === workId);
+      if (!w) return;
+      setState('detail');
       toSpreadBtn.style.visibility = 'visible';
 
-      leftTitle.textContent = '作品名とリンク';
-      rightTitle.textContent = '細かい説明（状態C）';
+      leftTitle.textContent = '作品情報とリンク';
+      rightTitle.textContent = '詳細説明';
 
-      // ※リンク先は未作成のため、後工程で works[].pageUrl / downloadUrl にURLを入れる
       const pageLink = w.pageUrl
-        ? `<a class="nav-button" href="${w.pageUrl}" style="text-decoration:none; text-align:center; padding: 12px 14px;">作品ページへ（任意）</a>`
-        : `<div class="ghost-link">作品ページリンク（任意）<span>後工程でURLを記述</span></div>`;
-
+        ? `<a class="nav-button" href="${w.pageUrl}">作品ページへ</a>`
+        : `<div class="ghost-link">作品ページURL未設定<span>後工程で設定</span></div>`;
       const downloadLink = w.downloadUrl
-        ? `<a class="nav-button" href="${w.downloadUrl}" style="text-decoration:none; text-align:center; padding: 12px 14px;">ダウンロード（任意）</a>`
-        : `<div class="ghost-link">ダウンロードリンク（任意）<span>後工程でURLを記述</span></div>`;
+        ? `<a class="nav-button" href="${w.downloadUrl}">ダウンロード</a>`
+        : `<div class="ghost-link">ダウンロードURL未設定<span>後工程で設定</span></div>`;
 
-      // 左ページ：作品名＋タグ（チップ（Chip））＋リンク
       spreadLeft.innerHTML = `
-        <div class="detail" aria-label="作品名とリンク">
+        <div class="detail" aria-label="作品情報">
           <h3>${escapeHtml(w.title)}</h3>
-
-          <div class="chips" aria-label="管理用タグ（チップ（Chip））">
-            ${w.tags.map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
-          </div>
-
+          <div class="chips" aria-label="タグ">${w.tags.map((t) => `<span class="chip">${escapeHtml(t)}</span>`).join('')}</div>
           <p>${escapeHtml(w.short)}</p>
-
           <h3>リンク</h3>
-          <div class="link-list" aria-label="リンク群（任意）">
-            <!-- TODO: 作品ページURL（任意）を works[].pageUrl に記述 -->
-            ${pageLink}
-            <!-- TODO: ダウンロードURL（任意）を works[].downloadUrl に記述 -->
-            ${downloadLink}
-          </div>
+          <div class="link-list">${pageLink}${downloadLink}</div>
         </div>
       `;
 
-      // 右ページ：詳細説明（選ばれた項目のみ）
       spreadRight.innerHTML = `
-        <div class="detail" aria-label="作品の詳細説明">
-          <h3>説明</h3>
+        <div class="detail" aria-label="作品詳細">
+          <h3>詳細</h3>
           <p>${escapeHtml(w.detail)}</p>
         </div>
       `;
@@ -399,118 +292,14 @@
         .replaceAll("'", '&#039;');
     }
 
-    // 操作：しおり（Bookmark）クリック → 状態B
     bookmarkBtn.addEventListener('click', () => {
       const st = book.getAttribute('data-state');
-      // 表紙（状態A）→一覧（状態B）は表紙の開閉、見開き内は柔らかいめくり
-      turnAnimation(renderSpread, (st === 'cover') ? 'cover' : 'inner');
+      turnAnimation(renderSpread, st === 'cover' ? 'cover' : 'inner');
     });
-    // 操作：表紙へ戻る
     toCoverBtn.addEventListener('click', () => turnAnimation(renderCover, 'cover'));
-    // 操作：一覧へ戻る
-    toSpreadBtn.addEventListener('click', () => {
-      // 見開き内（状態C→B）は柔らかいめくり
-      turnAnimation(renderSpread, 'inner');
-    });
+    toSpreadBtn.addEventListener('click', () => turnAnimation(renderSpread, 'inner'));
 
-    function ensureSpreadTurnOverlay() {
-      let overlay = document.getElementById('spreadTurnOverlay');
-      if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'spreadTurnOverlay';
-        overlay.setAttribute('aria-hidden', 'true');
-        const turnPage = document.createElement('div');
-        turnPage.className = 'turnPage';
-        overlay.appendChild(turnPage);
-        document.body.appendChild(overlay);
-      }
-      const turnPage = overlay.querySelector('.turnPage');
-      return { overlay, turnPage };
-    }
-
-    function playSpreadNavigation(url) {
-      const { overlay, turnPage } = ensureSpreadTurnOverlay();
-      const rightPageEl = document.getElementById('rightPage');
-      let hasNavigated = false;
-
-      const completeNavigation = () => {
-        if (hasNavigated) return;
-        hasNavigated = true;
-        book.classList.remove('is-spread-exiting');
-        window.location.href = url;
-      };
-
-      // 右ページ位置にオーバーレイを合わせる
-      if (rightPageEl) {
-        const rect = rightPageEl.getBoundingClientRect();
-        const scrollX = window.scrollX || window.pageXOffset;
-        const scrollY = window.scrollY || window.pageYOffset;
-        const turnPageStyle = turnPage.style;
-        turnPageStyle.left = `${rect.left + scrollX}px`;
-        turnPageStyle.top = `${rect.top + scrollY}px`;
-        turnPageStyle.width = `${rect.width}px`;
-        turnPageStyle.height = `${rect.height}px`;
-        const rpComputed = window.getComputedStyle(rightPageEl);
-        turnPageStyle.borderRadius = rpComputed.borderRadius || '18px';
-      }
-
-      turnPage.classList.remove('is-flipping');
-      overlay.classList.remove('is-active');
-      void overlay.offsetWidth; // reflow to restart animation
-
-      requestAnimationFrame(() => {
-        overlay.classList.add('is-active');
-        book.classList.add('is-spread-exiting');
-        requestAnimationFrame(() => {
-          turnPage.classList.add('is-flipping');
-        });
-      });
-
-      const onEnd = (event) => {
-        if (event.animationName !== 'spreadPageFlipOut') return;
-        turnPage.removeEventListener('animationend', onEnd);
-        completeNavigation();
-      };
-
-      turnPage.addEventListener('animationend', onEnd);
-      window.setTimeout(completeNavigation, spreadNavDuration + 120);
-    }
-
-    // 見開きページから他ページへ移動する際のオーバーレイめくり演出（イベント委譲）
-    (function setupSpreadExitTurn() {
-      document.addEventListener('click', (event) => {
-        if (event.defaultPrevented) return;
-        if (event.button !== 0) return;
-        const navTarget = event.target.closest('[data-nav-href], a[href]:not([href^="#"])');
-        if (!navTarget) return;
-
-        // 新しいタブや修飾キー操作、ミドルクリックはブラウザ挙動を尊重
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1 || navTarget.target === '_blank') return;
-
-        const href = navTarget.dataset.navHref || navTarget.href;
-        if (!href || href === window.location.href) return;
-
-        // 見開き（状態B/C）のみで発火。表紙は従来演出のまま。
-        const state = book.getAttribute('data-state');
-        if (state === 'cover') return;
-        if (reduceMotionQuery.matches) return;
-
-        if (spreadNavigationInFlight) {
-          event.preventDefault();
-          return;
-        }
-        spreadNavigationInFlight = true;
-        event.preventDefault();
-
-        // 既存の表紙用クラスが残留していても演出が潰れないよう、念のため外す
-        book.classList.remove('is-turning', 'is-page-turning', 'is-navigating');
-        playSpreadNavigation(href);
-      });
-    })();
-
-    // 初期表示：表紙（状態A）
     renderCover();
   </script>
-
 </body>
 </html>

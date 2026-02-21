@@ -233,7 +233,7 @@ body {
     /* ===== ポートフォリオリンク掲載ページ（本UI） 追加スタイル ===== */
 .stage[aria-label="ポートフォリオリンク掲載ページ"] .main {
   /* mainエリア（指定：1365×650） */
-  width: 1365px;
+  width: min(1365px, 100%);
   height: 100%;
   min-height: 0;
   margin: 0 auto;
@@ -242,19 +242,19 @@ body {
   display: block;
 
   /* 本UIが右カードに重なれるようにする（右カードは背面に残る） */
-  overflow: visible;
+  overflow: hidden;
 }
 
 .stage[aria-label="ポートフォリオリンク掲載ページ"] .book-area {
   position: absolute;
   inset: 0;
-  overflow: visible;
+  overflow: hidden;
   z-index: 4; /* 右カードより前面 */
   pointer-events: none; /* 本以外は背面クリックを阻害しない */
 }
 
 
-    .book {
+.book {
   /* 指定：
    * - 本の高さ：630px
    * - 見開き幅：1300px
@@ -262,14 +262,24 @@ body {
    */
   position: absolute;
   top: 50%;
-  left: 20px;
-
-  width: 630px;
-  height: 630px;
+  left: 50%;
+  --book-closed-width: min(630px, calc(100% - 24px));
+  --book-open-width: min(1300px, calc(100% - 24px));
+  --book-height: min(630px, calc(100% - 20px));
+  --book-spine-width: 40px;
+  --cover-extra-width: 24px;
+  --cover-width: calc((100% - var(--book-spine-width)) / 2 + var(--cover-extra-width));
+  width: var(--book-closed-width);
+  height: var(--book-height);
+  --book-move-dur: 500ms;
+  --cover-turn-dur: 500ms;
+  --page-turn-dur: 500ms;
+  --page-turn-inner-dur: 500ms;
+  --spread-exit-dur: 500ms;
 
   perspective: 1400px;
   user-select: none;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   transition:
     left var(--book-move-dur) cubic-bezier(0.22, 1, 0.36, 1),
     width var(--book-move-dur) cubic-bezier(0.22, 1, 0.36, 1),
@@ -281,8 +291,8 @@ body {
 .book[data-state="spread"],
 .book[data-state="detail"] {
   left: 50%;
-  width: 1300px;
-  height: 630px;
+  width: var(--book-open-width);
+  height: var(--book-height);
   transform: translate(-50%, -50%);
 }
 
@@ -298,7 +308,7 @@ body {
     .bookmark {
       position: absolute;
       top: 110px;
-      right: -18px;
+      right: -12px;
       width: 42px;
       height: 150px;
       border: none;
@@ -321,8 +331,11 @@ body {
     /* 表紙 */
     .cover {
       position: absolute;
-      inset: 0;
-      border-radius: 20px;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: var(--cover-width);
+      border-radius: 20px 14px 14px 20px;
       background:
         radial-gradient(1200px 680px at 40% 20%, rgba(255,255,255,0.45), rgba(255,255,255,0) 55%),
         linear-gradient(135deg, rgba(140, 92, 52, 0.95), rgba(78, 44, 24, 0.98));
@@ -338,8 +351,52 @@ body {
       z-index: 10;
       display: flex;
       flex-direction: column;
-      padding: 34px 40px;
+      padding: 28px 28px 24px 52px;
       color: rgba(255, 255, 255, 0.96);
+      overflow: hidden;
+    }
+
+    /* Left side spine texture */
+    .cover::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: var(--book-spine-width);
+      border-radius: 20px 0 0 20px;
+      background:
+        linear-gradient(90deg,
+          rgba(40, 20, 10, 0.22) 0%,
+          rgba(255, 255, 255, 0.1) 28%,
+          rgba(40, 20, 10, 0.26) 68%,
+          rgba(20, 10, 5, 0.38) 100%
+        );
+      box-shadow:
+        inset -1px 0 0 rgba(255, 255, 255, 0.25),
+        inset -12px 0 18px rgba(0, 0, 0, 0.15);
+      pointer-events: none;
+    }
+
+    /* Right edge thickness (fore-edge) */
+    .cover::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      right: -8px;
+      width: 16px;
+      border-radius: 0 10px 10px 0;
+      background:
+        linear-gradient(90deg,
+          rgba(255, 247, 236, 0.9) 0%,
+          rgba(229, 206, 183, 0.9) 62%,
+          rgba(160, 128, 102, 0.68) 100%
+        );
+      box-shadow:
+        1px 0 8px rgba(40, 20, 10, 0.18),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+      pointer-events: none;
     }
 
     .cover-title {
@@ -353,7 +410,7 @@ body {
 
     .cover-title h1 {
       margin: 0;
-      font-size: 34px;
+      font-size: clamp(24px, 2.2vw, 34px);
       letter-spacing: 0.04em;
     }
 
@@ -390,7 +447,7 @@ body {
 
     .featured-item .title {
       font-weight: 800;
-      font-size: 16px;
+      font-size: clamp(14px, 1.2vw, 16px);
       margin-bottom: 6px;
     }
     .featured-item .desc {
@@ -443,6 +500,8 @@ body {
     inset 0 0 0 2px rgba(255,255,255,0.55),
     inset 0 26px 34px rgba(120, 70, 30, 0.08);
   z-index: 1;
+  transform-origin: center center;
+  transform-style: preserve-3d;
 
   overflow: hidden;
 }
@@ -732,13 +791,13 @@ body {
         transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
         filter: brightness(1);
       }
-      32% {
-        transform: translateX(12px) rotateY(-8deg) skewY(-1.1deg) scale(0.995);
-        filter: brightness(0.985);
+      35% {
+        transform: translateX(18px) rotateY(-14deg) skewY(-1.3deg) scale(0.992);
+        filter: brightness(0.97);
       }
-      62% {
-        transform: translateX(-4px) rotateY(5deg) skewY(0.6deg) scale(0.998);
-        filter: brightness(0.995);
+      68% {
+        transform: translateX(-8px) rotateY(8deg) skewY(0.7deg) scale(0.996);
+        filter: brightness(0.985);
       }
       100% {
         transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
@@ -751,17 +810,13 @@ body {
         transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
         filter: brightness(1);
       }
-      26% {
-        transform: translateX(8px) rotateY(-5deg) skewY(-0.6deg) scale(0.997);
-        filter: brightness(0.992);
+      35% {
+        transform: translateX(12px) rotateY(-9deg) skewY(-0.8deg) scale(0.995);
+        filter: brightness(0.98);
       }
-      56% {
-        transform: translateX(-3px) rotateY(3deg) skewY(0.35deg) scale(0.999);
-        filter: brightness(0.997);
-      }
-      82% {
-        transform: translateX(1px) rotateY(-1deg) skewY(-0.12deg) scale(1);
-        filter: brightness(1);
+      70% {
+        transform: translateX(-6px) rotateY(6deg) skewY(0.5deg) scale(0.997);
+        filter: brightness(0.99);
       }
       100% {
         transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
@@ -771,8 +826,8 @@ body {
 
     @keyframes curlShadeSoft {
       0% { opacity: 0; }
-      30% { opacity: 0.38; }
-      62% { opacity: 0.22; }
+      35% { opacity: 0.48; }
+      70% { opacity: 0.28; }
       100% { opacity: 0; }
     }
 
@@ -884,8 +939,8 @@ body {
 
     @keyframes curlShade {
       0% { opacity: 0; }
-      28% { opacity: 0.55; }
-      62% { opacity: 0.32; }
+      35% { opacity: 0.6; }
+      70% { opacity: 0.34; }
       100% { opacity: 0; }
     }
 
@@ -895,7 +950,7 @@ body {
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 40px; /* のりしろ（綴じ）想定 */
+  width: var(--book-spine-width, 40px); /* のりしろ（綴じ）想定 */
   transform: translateX(-50%);
   border-radius: 999px;
   background:
