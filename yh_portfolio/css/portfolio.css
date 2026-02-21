@@ -262,7 +262,7 @@ body {
    */
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 80%;
   --book-closed-width: min(630px, calc(100% - 24px));
   --book-open-width: min(1300px, calc(100% - 24px));
   --book-height: min(630px, calc(100% - 20px));
@@ -271,11 +271,11 @@ body {
   --cover-width: calc((100% - var(--book-spine-width)) / 2 + var(--cover-extra-width));
   width: var(--book-closed-width);
   height: var(--book-height);
-  --book-move-dur: 500ms;
-  --cover-turn-dur: 500ms;
-  --page-turn-dur: 500ms;
-  --page-turn-inner-dur: 500ms;
-  --spread-exit-dur: 500ms;
+  --book-move-dur: 1200ms;
+  --cover-turn-dur: 1200ms;
+  --page-turn-dur: 1200ms;
+  --page-turn-inner-dur: 1200ms;
+  --spread-exit-dur: 1200ms;
 
   perspective: 1400px;
   user-select: none;
@@ -308,7 +308,7 @@ body {
     .bookmark {
       position: absolute;
       top: 110px;
-      right: -12px;
+      right: 2px;
       width: 42px;
       height: 150px;
       border: none;
@@ -322,6 +322,13 @@ body {
       writing-mode: vertical-rl;
       text-orientation: mixed;
       z-index: 20;
+      transform: translateX(35%);
+    }
+
+    .book[data-state="cover"] .bookmark {
+      right: -6px;
+      transform: none;
+      z-index: 30;
     }
     .bookmark:focus-visible {
       outline: 3px solid rgba(255,255,255,0.72);
@@ -401,9 +408,10 @@ body {
 
     .cover-title {
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 8px;
       padding-bottom: 18px;
       border-bottom: 1px solid rgba(255,255,255,0.16);
     }

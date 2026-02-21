@@ -40,7 +40,6 @@
 
             <div class="cover-hint" aria-hidden="true">
               <span>作品を選択すると詳細へ移動します</span>
-              <span class="arrow">▶ 一覧へ</span>
             </div>
           </div>
 
@@ -155,12 +154,12 @@
     }
 
     function turnAnimation(fn, kind = 'cover') {
-      const coverDur = 500;
-      const innerDur = 500;
+      const coverDur = 1200;
+      const innerDur = 1200;
       const isInner = kind === 'inner';
       const cls = isInner ? 'is-page-turning' : 'is-turning';
       const dur = isInner ? innerDur : coverDur;
-      const switchDelay = 220;
+      const switchDelay = 560;
 
       book.classList.remove('is-turning', 'is-page-turning');
       void book.offsetWidth;
