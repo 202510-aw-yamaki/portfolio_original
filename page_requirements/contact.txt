@@ -1,0 +1,51 @@
+﻿【対象ファイル】
+yh_portfolio_contact.html
+
+【ページの目的】
+- 付箋メモを郵便ポストに投函する演出で、送信体験を表現する。
+- フォーム入力 → 送信演出 → 送信完了カード表示の流れを提供する。
+
+【レイアウト仕様】
+- 固定ステージ構成: 1440x910。
+- 上部: 共通ヘッダー（ブランド + 4ページナビ）。
+- 中央:
+  - 左: 郵便ポストのビジュアル。
+  - 右: 付箋型フォーム（sticky-note）。
+  - 成功時に success-card を重ねて表示。
+- 下部: 共通フッターナビ。
+
+【フォーム仕様】
+- 入力項目:
+  - お問い合わせ内容（textarea, required）
+  - お名前（text, required）
+  - メール（email, required）
+- 補助項目:
+  - 「投函演出をスキップ」チェックボックス（skipAnimation）
+- 操作ボタン:
+  - 送信する（submit）
+  - リセット（resetButton）
+
+【インタラクション仕様】
+- submit時はデフォルト送信を抑止し、ページ内演出を実行。
+- 送信中は resetButton 以外を一時無効化。
+- 分岐:
+  - skipAnimation がON、または prefers-reduced-motion の場合:
+    - 演出なしで即座に成功表示。
+  - それ以外:
+    - sticky-note に foldAndFly / cornerFold アニメーション適用。
+    - animationend 後に成功表示。
+- 成功表示:
+  - sticky-wrapper を非表示状態へ。
+  - resultCard を可視化。
+- リセット:
+  - form.reset()
+  - 演出状態（is-animating/is-hidden/is-visible）を初期化。
+  - 入力再開可能状態へ復帰。
+
+【アクセシビリティ仕様】
+- success-card は role="status" / aria-live で通知。
+- フォーム補助文に aria-describedby を使用。
+- prefers-reduced-motion に対応。
+
+【遷移仕様】
+- ヘッダー/フッターのリンクで4ページへ移動可能。
