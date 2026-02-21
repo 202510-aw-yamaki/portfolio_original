@@ -59,6 +59,7 @@
 
   <script>
     const svg = document.querySelector('.donut');
+    const donutArea = document.querySelector('.donut-area');
     const instruction = document.getElementById('instruction');
     const panel = document.getElementById('panel');
     const panelTitle = document.getElementById('panelTitle');
@@ -218,7 +219,32 @@
       }
     });
 
+    const fitDonutToMain = () => {
+      const rect = donutArea.getBoundingClientRect();
+      const availableWidth = Math.max(0, rect.width - 12);
+      const availableHeight = Math.max(0, rect.height - 12);
+      const side = Math.floor(Math.min(availableWidth, availableHeight));
+      if (side <= 0) return;
+
+      // Always keep the donut inside the main area.
+      donutArea.style.setProperty('--donut-size', `${side}px`);
+
+      // Center helper circle tracks donut size and never exceeds it.
+      const instructionSize = Math.max(64, Math.floor(side * 0.34));
+      donutArea.style.setProperty('--instruction-size', `${Math.min(instructionSize, side)}px`);
+    };
+
     createDonut();
+    fitDonutToMain();
+
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => fitDonutToMain());
+      ro.observe(donutArea);
+      ro.observe(document.querySelector('.main'));
+    }
+
+    window.addEventListener('resize', fitDonutToMain);
+    window.addEventListener('orientationchange', fitDonutToMain);
   </script>
 </body>
 </html>

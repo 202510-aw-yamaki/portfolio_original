@@ -13,19 +13,20 @@
 
 .donut-area {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   min-height: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 .donut {
-  width: min(78vw, 420px);
+  display: block;
+  width: var(--donut-size, 320px);
+  height: var(--donut-size, 320px);
   max-width: 100%;
-  height: auto;
-  max-height: min(100%, calc(100dvh - 380px));
-  aspect-ratio: 1 / 1;
+  max-height: 100%;
+  flex: 0 0 auto;
   filter: drop-shadow(0 10px 24px rgba(110, 60, 20, 0.14));
 }
 
@@ -43,8 +44,8 @@
 .instruction {
   position: absolute;
   text-align: center;
-  width: clamp(120px, 30vw, 200px);
-  height: clamp(120px, 30vw, 200px);
+  width: var(--instruction-size, 120px);
+  height: var(--instruction-size, 120px);
   border-radius: 50%;
   background: #fff6ec;
   display: flex;
@@ -226,10 +227,8 @@
   }
 
   .donut {
-    width: min(55vw, 460px);
-    max-width: 100%;
-    height: auto;
-    max-height: min(100%, calc(100dvh - 360px));
+    width: var(--donut-size, 380px);
+    height: var(--donut-size, 380px);
   }
 
   .content-panel {
@@ -266,14 +265,13 @@
   }
 
   .donut {
-    width: min(100%, 420px, calc(100dvh - 360px));
-    height: auto;
-    max-height: 100%;
+    width: var(--donut-size, 420px);
+    height: var(--donut-size, 420px);
   }
 
   .instruction {
-    width: clamp(116px, 14vw, 180px);
-    height: clamp(116px, 14vw, 180px);
+    width: var(--instruction-size, 132px);
+    height: var(--instruction-size, 132px);
     gap: 8px;
   }
 
