@@ -55,4 +55,8 @@ yh_portfolio/portfolio.html
 - ボタン類に aria-label を付与。
 
 【遷移仕様】
-- ヘッダー・右ボタン・フッターから4ページ間を相互遷移。
+- ヘッダーとフッターに以下リンクを配置:
+  - yh_portfolio/profile.html
+  - yh_portfolio/portfolio.html
+  - yh_portfolio/skills.html
+  - yh_portfolio/contact.html
