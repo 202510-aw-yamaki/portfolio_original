@@ -1,5 +1,5 @@
 ﻿【対象ファイル】
-yh_portfolio_contact.html
+yh_portfolio/contact.html
 
 【ページの目的】
 - 付箋メモを郵便ポストに投函する演出で、送信体験を表現する。
@@ -48,4 +48,8 @@ yh_portfolio_contact.html
 - prefers-reduced-motion に対応。
 
 【遷移仕様】
-- ヘッダー/フッターのリンクで4ページへ移動可能。
+- ヘッダーとフッターに以下リンクを配置:
+  - yh_portfolio/profile.html
+  - yh_portfolio/portfolio.html
+  - yh_portfolio/skills.html
+  - yh_portfolio/contact.html

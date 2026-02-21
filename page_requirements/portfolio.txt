@@ -1,5 +1,5 @@
 ﻿【対象ファイル】
-yh_portfolio_portfolio.html
+yh_portfolio/portfolio.html
 
 【ページの目的】
 - 「本をめくる」体験で作品一覧・詳細を切り替える。

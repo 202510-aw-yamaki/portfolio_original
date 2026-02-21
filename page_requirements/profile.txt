@@ -38,7 +38,7 @@ yh_portfolio_profile.html
 
 【遷移仕様】
 - ヘッダーとフッターに以下リンクを配置:
-  - yh_portfolio_profile.html
-  - yh_portfolio_portfolio.html
-  - yh_portfolio_skills.html
-  - yh_portfolio_contact.html
+  - yh_portfolio/profile.html
+  - yh_portfolio/portfolio.html
+  - yh_portfolio/skills.html
+  - yh_portfolio/contact.html

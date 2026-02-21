@@ -1,5 +1,5 @@
 ﻿【対象ファイル】
-yh_portfolio_skills.html
+yh_portfolio/skills.html
 
 【ページの目的】
 - 資格と使用ツールを「コルクボードに紙を貼る」演出で一覧表示する。
@@ -36,4 +36,8 @@ yh_portfolio_skills.html
 - prefers-reduced-motion 時は回転・アニメーションを抑制。
 
 【遷移仕様】
-- ヘッダー/フッターのリンクで4ページへ移動可能。
+- ヘッダーとフッターに以下リンクを配置:
+  - yh_portfolio/profile.html
+  - yh_portfolio/portfolio.html
+  - yh_portfolio/skills.html
+  - yh_portfolio/contact.html
