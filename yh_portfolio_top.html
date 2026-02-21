@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Top Sequence Preview</title>
+  <style>
+:root{
+  --stage-w: 1440px;
+  --stage-h: 910px;
+}
+
+    html, body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  background:#0b1020;
+
+  min-width: var(--stage-w); /* 1440未満にしない */
+  overflow-x: auto;          /* 1440未満の画面では横スクロール */
+}
+
+
+    /* Stage */
+.fv{
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  width: var(--stage-w);     /* 常に1440固定 */
+  margin-inline: auto;       /* 1440より広い画面では中央寄せ */
+
+  /* 1440×910の比率を維持（小さい画面では縮小） */
+  aspect-ratio: 1440 / 910;
+
+  /* 念のため上限 */
+  max-height: var(--stage-h);
+}
+
+.fv__bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  transform: none; /* 端が切れる原因なので無効化 */
+  z-index:0;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+
+    /* Horses */
+    .horse{
+      position:absolute;
+      bottom: 6%;
+      left: 50%;
+      width: min(38%, 560px);
+      height: auto;
+      transform: translateX(-50%) scale(1);
+      transform-origin: 50% 85%;
+      z-index: 2; /* カード（z-index:7）の後ろを通す */
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+      opacity: 1;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
+    .horse--gray{ transform: translateX(-62%) scale(1.00); z-index: 3; }
+    .horse--chestnut{ transform: translateX(-38%) scale(0.99); z-index: 2; }
+
+    /* ループ制御用の一時非表示 */
+    .horse.is-hidden{ opacity: 0; }
+
+    /* Pose fade (drink -> look only) */
+    .is-pose-fade{
+      opacity: 0;
+      transform: translateX(var(--tx, -50%)) scale(var(--sc, 1));
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    /* Run away movement (both to the right, chestnut is slightly delayed) */
+    .fv.is-run .horse--gray{
+      animation: runAwayRightGray 2.4s 0.0s ease-in forwards;
+    }
+    .fv.is-run .horse--chestnut{
+      animation: runAwayRightChestnut 2.4s 0.22s ease-in forwards;
+    }
+
+    @keyframes runAwayRightGray{
+      0%   { transform: translateX(-62%) translateY(0px) scale(1.00); opacity: 1; }
+      35%  { transform: translateX( -5%) translateY(2px) scale(0.92); opacity: 1; }
+      70%  { transform: translateX( 55%) translateY(0px) scale(0.82); opacity: 0.95; }
+      100% { transform: translateX(140%) translateY(-1px) scale(0.72); opacity: 0; }
+    }
+    @keyframes runAwayRightChestnut{
+      0%   { transform: translateX(-38%) translateY(0px) scale(0.99); opacity: 1; }
+      35%  { transform: translateX( 20%) translateY(2px) scale(0.92); opacity: 1; }
+      70%  { transform: translateX( 70%) translateY(0px) scale(0.82); opacity: 0.95; }
+      100% { transform: translateX(160%) translateY(-1px) scale(0.72); opacity: 0; }
+    }
+
+    /* 左から戻って中央へ（ループ用） */
+    .fv.is-return .horse--gray{
+      animation: returnFromLeftGray 2.2s 0.00s ease-out both;
+    }
+    .fv.is-return .horse--chestnut{
+      animation: returnFromLeftChestnut 2.2s 0.12s ease-out both;
+    }
+
+    @keyframes returnFromLeftGray{
+      0%   { transform: translateX(-220%) translateY(0px) scale(0.72); opacity: 0; }
+      55%  { transform: translateX(-120%) translateY(1px) scale(0.86); opacity: 1; }
+      100% { transform: translateX( -62%) translateY(0px) scale(1.00); opacity: 1; }
+    }
+    @keyframes returnFromLeftChestnut{
+      0%   { transform: translateX(-210%) translateY(0px) scale(0.72); opacity: 0; }
+      55%  { transform: translateX(-105%) translateY(1px) scale(0.86); opacity: 1; }
+      100% { transform: translateX( -38%) translateY(0px) scale(0.99); opacity: 1; }
+    }
+
+    /* Hero: drop from top AFTER horses run away */
+    .heroWrap{
+      position:absolute;
+      left: 50%;
+      top: 24px;
+      transform: translate(-50%, -130%);
+      opacity: 0;
+      z-index: 6; /* 馬より前、カードより後 */
+      will-change: transform, opacity;
+      transition: transform 900ms cubic-bezier(.2,.8,.2,1), opacity 600ms ease;
+      pointer-events:none;
+    }
+    .fv.is-hero .heroWrap{
+      transform: translate(-50%, 0%);
+      opacity: 1;
+    }
+
+    .heroWrap__inner{
+      width: 1200px;
+      height: 240px;
+      overflow: hidden;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .heroWrap__titleWrap{
+      height: 130px;
+      align-self: stretch;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .heroWrap__title{
+      text-align: center;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 96px;
+      font-family: Great Vibes;
+      font-weight: 400;
+      line-height: 112px;
+      word-wrap: break-word;
+    }
+
+    /* Cards: float in AFTER hero lands */
+    .leafCard{
+      position:absolute;
+      z-index: 7; /* 馬は必ずカードの後ろ */
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.35));
+      transition:
+        opacity 700ms ease,
+        transform 700ms cubic-bezier(.2,.8,.2,1);
+      transition-delay: var(--delay, 0ms);
+      pointer-events:auto;
+    }
+    .leafCard { cursor: pointer; }
+    .leafCard:focus-visible { outline: 3px solid rgba(255,255,255,.65); outline-offset: 6px; }
+    .fv.is-cards .leafCard{
+      opacity: 1;
+      transform: translateY(0px) scale(1);
+    }
+
+    /* Placement (adjust to match your tree art) */
+    .leafCard--profile   { left: 18%; top: 32%; --delay:  0ms; }
+    .leafCard--portfolio { left: 10%; top: 56%; --delay: 90ms; }
+    .leafCard--skills    { left: 72%; top: 32%; --delay: 180ms; }
+    .leafCard--contact   { left: 80%; top: 56%; --delay: 270ms; }
+    .leafCard{ transform-origin: 50% 0%; }
+
+    .leafCard__stack{
+      width: 220px;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .leafCard__btn{
+      align-self: stretch;
+      height: 44px;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, var(--grad-from) 0%, var(--grad-to) 100%);
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      border-radius: 8px;
+      outline: 1px rgba(255, 255, 255, 0.20) solid;
+      outline-offset: -1px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .leafCard__label{
+      text-align: center;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 14px;
+      font-family: Noto Sans JP;
+      font-weight: 700;
+      line-height: 20px;
+      letter-spacing: 1.12px;
+      word-wrap: break-word;
+    }
+
+    .leafCard__shadow{
+      width: 220px;
+      height: 44px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.90);
+      font-size: 14px;
+      font-family: Noto Sans JP;
+      font-weight: 600;
+      line-height: 20px;
+      word-wrap: break-word;
+      text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.35);
+    }
+
+    .leafCard--profile{ --grad-from: #6FB52F; --grad-to: #304F15; }
+    .leafCard--portfolio{ --grad-from: #3A82B8; --grad-to: #1A3A52; }
+    .leafCard--skills{ --grad-from: #D99B2D; --grad-to: #735218; }
+    .leafCard--contact{ --grad-from: #7A4CB5; --grad-to: #35214F; }
+
+
+
+    @media (prefers-reduced-motion: reduce){
+      .fv.is-run .horse--gray,
+      .fv.is-run .horse--chestnut{ animation: none; opacity: 0; }
+
+      .fv.is-return .horse--gray,
+      .fv.is-return .horse--chestnut{ animation: none; opacity: 0; }
+
+      .heroWrap{ transition: none; transform: translate(-50%, 0%); opacity: 1; }
+      .leafCard{ transition: none; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="fv" aria-label="トップの風景">
+    <img class="fv__bg" src="image/bg-mountain-lake.png" alt="" />
+
+    <img
+      class="horse horse--gray"
+      src="image/horse-gray-drink.png"
+      alt="葦毛の馬"
+      data-drink="image/horse-gray-drink.png"
+      data-look="image/horse-gray-inanaki.png"
+      data-run-def="image/horse-gray-run.png"
+      data-run-a1="image/horse-gray-run-a1.png"
+      data-run-a2="image/horse-gray-run-a2.png"
+      data-run-b1="image/horse-gray-run-b1.png"
+      data-run-b2="image/horse-gray-run-b2.png"
+    />
+    <img
+      class="horse horse--chestnut"
+      src="image/horse-chestnut-drink.png"
+      alt="栗毛の馬"
+      data-drink="image/horse-chestnut-drink.png"
+      data-look="image/horse-chestnut-inanaki.png"
+      data-run-def="image/horse-chestnut-run.png"
+      data-run-a1="image/horse-chestnut-run-a1.png"
+      data-run-a2="image/horse-chestnut-run-a2.png"
+      data-run-b1="image/horse-chestnut-run-b1.png"
+      data-run-b2="image/horse-chestnut-run-b2.png"
+    />
+
+    <!-- ヒーロー領域（ご提示のHTML） -->
+    <div class="heroWrap" aria-hidden="true">
+      <div class="heroWrap__inner">
+        <div class="heroWrap__titleWrap">
+          <div class="heroWrap__title">H.Yamaki’sPortfolio</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 各コンテンツ（ご提示のHTML） -->
+    <div class="leafCard leafCard--profile" role="link" tabindex="0" aria-label="プロフィール（Profile）へ">
+      <div class="leafCard__stack">
+        <div class="leafCard__btn">
+          <div class="leafCard__label">PROFILE</div>
+        </div>
+        <div class="leafCard__shadow"></div>
+      </div>
+    </div>
+
+    <div class="leafCard leafCard--portfolio" role="link" tabindex="0" aria-label="ポートフォリオ（Portfolio）へ">
+      <div class="leafCard__stack">
+        <div class="leafCard__btn">
+          <div class="leafCard__label">MY PORTFOLIO</div>
+        </div>
+        <div class="leafCard__shadow"></div>
+      </div>
+    </div>
+
+    <div class="leafCard leafCard--skills" role="link" tabindex="0" aria-label="スキル（Skills）へ">
+      <div class="leafCard__stack">
+        <div class="leafCard__btn">
+          <div class="leafCard__label">SKILLS</div>
+        </div>
+        <div class="leafCard__shadow"></div>
+      </div>
+    </div>
+
+    <div class="leafCard leafCard--contact" role="link" tabindex="0" aria-label="お問い合わせ（Contact）へ">
+      <div class="leafCard__stack">
+        <div class="leafCard__btn">
+          <div class="leafCard__label">CONTACT</div>
+        </div>
+        <div class="leafCard__shadow"></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function(){
+      const fv = document.querySelector(".fv");
+      const horses = Array.from(document.querySelectorAll(".horse"));
+
+      // 走りの切替（デフォ→A1→A2→A1→デフォ→B1→B2→B1→デフォ→…）
+      const runSeqKeys = ["runDef","runA1","runA2","runA1","runDef","runB1","runB2","runB1","runDef"];
+
+      const preload = (src) => new Promise((resolve) => {
+        if (!src) return resolve(false);
+        const im = new Image();
+        im.onload = () => resolve(true);
+        im.onerror = () => resolve(false);
+        im.src = src;
+      });
+
+      const allSrcs = horses.flatMap(h => [
+        h.dataset.drink, h.dataset.look,
+        h.dataset.runDef, h.dataset.runA1, h.dataset.runA2, h.dataset.runB1, h.dataset.runB2
+      ]);
+
+      Promise.all(allSrcs.map(preload)).then(() => {
+        const io = new IntersectionObserver(([e]) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          startSequence();
+        }, { threshold: 0.55 });
+        io.observe(fv);
+      });
+
+      function swapPoseSoft(imgEl, poseKey){
+        const nextSrc = imgEl.dataset[poseKey];
+        if (!nextSrc) return;
+
+        imgEl.classList.add("is-pose-fade");
+        const isGray = imgEl.classList.contains("horse--gray");
+        imgEl.style.setProperty("--tx", isGray ? "-62%" : "-38%");
+        imgEl.style.setProperty("--sc", isGray ? "1.00" : "0.99");
+
+        setTimeout(() => {
+          imgEl.src = nextSrc;
+          imgEl.classList.remove("is-pose-fade");
+        }, 240);
+      }
+
+      function swapPoseHard(imgEl, poseKey){
+        const nextSrc = imgEl.dataset[poseKey];
+        if (!nextSrc) return;
+        imgEl.src = nextSrc;
+      }
+
+      function startRunFrames({ frameMs = 90, totalMs = 2400 } = {}){
+        horses.forEach(h => swapPoseHard(h, "runDef"));
+
+        let idx = 0;
+        const tick = () => {
+          const k = runSeqKeys[idx % runSeqKeys.length];
+          horses.forEach(h => swapPoseHard(h, k));
+          idx += 1;
+        };
+
+        tick();
+        const timer = setInterval(tick, frameMs);
+        setTimeout(() => clearInterval(timer), totalMs);
+      }
+
+      // ========== ここから「ループ」追加 ==========
+      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+      let loopStarted = false;
+
+      async function startHorseLoop(){
+        if (loopStarted) return;
+        loopStarted = true;
+
+        const reduceMotion = window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) return;
+
+        // ループ設定（数値だけでテンポ調整できます）
+        const pauseOffMs = 1600;  // 右へ消えた後の待ち
+        const returnMs   = 2200;  // 左から戻る時間（CSSと合わせる）
+        const drinkMs    = 1700;  // 水飲み時間
+        const lookMs     = 900;   // 顔上げ時間
+        const runMs      = 2400;  // 右へ走り去る時間（CSSと合わせる）
+
+        // 初回の走り去り後にループ開始（以後ずっと繰り返し）
+        while(true){
+          await sleep(pauseOffMs);
+
+          // 1) 左から戻る（リセット時のチラつき防止に一瞬隠す）
+          fv.classList.remove("is-run");
+          fv.classList.remove("is-return");
+          horses.forEach(h => h.classList.add("is-hidden"));
+          void fv.offsetWidth; // 再トリガー
+
+          startRunFrames({ frameMs: 90, totalMs: returnMs });
+          fv.classList.add("is-return");
+
+          // 戻りアニメーションの0%状態が確実に適用された次のフレームで表示（チラつき防止）
+          requestAnimationFrame(() => {
+            horses.forEach(h => h.classList.remove("is-hidden"));
+          });
+
+          await sleep(returnMs);
+          fv.classList.remove("is-return");
+
+          // 2) 水飲み
+          horses.forEach(h => swapPoseSoft(h, "drink"));
+          await sleep(drinkMs);
+
+          // 3) 顔上げ
+          horses.forEach(h => swapPoseSoft(h, "look"));
+          await sleep(lookMs);
+
+          // 4) 右へ走り去る
+          void fv.offsetWidth;
+          startRunFrames({ frameMs: 90, totalMs: runMs });
+          fv.classList.add("is-run");
+
+          await sleep(runMs + 80);
+
+          // 次の「左から戻る」まで、念のため隠す
+          fv.classList.remove("is-run");
+          horses.forEach(h => h.classList.add("is-hidden"));
+        }
+      }
+      // ========== ここまで「ループ」追加 ==========
+
+      function revealHeroAndCards(){
+        fv.classList.add("is-hero");
+        setTimeout(() => {
+          fv.classList.add("is-cards");
+          // カード表示はそのままに、馬だけループを開始
+          startHorseLoop();
+        }, 920);
+      }
+
+      function startSequence(){
+        // 1) 水飲み（初期表示）
+        // 2) 顔上げ
+        setTimeout(() => {
+          horses.forEach(h => swapPoseSoft(h, "look"));
+        }, 1400);
+
+        // 3) 走り（足パターン） + 走り去り → ヒーロー降下 → カード浮上
+        setTimeout(() => {
+          startRunFrames({ frameMs: 90, totalMs: 2400 });
+          fv.classList.add("is-run");
+
+          const chestnut = document.querySelector(".horse--chestnut");
+          const onEnd = (ev) => {
+            if (ev.animationName !== "runAwayRightChestnut") return;
+            revealHeroAndCards();
+          };
+          chestnut.addEventListener("animationend", onEnd, { once: true });
+
+          // 保険（animationend が取れない環境のため）
+          setTimeout(() => {
+            if (!fv.classList.contains("is-hero")) revealHeroAndCards();
+          }, 2900);
+
+        }, 2700);
+      }
+
+      const bindNavCard = (selector, url) => {
+        const el = document.querySelector(selector);
+        if (!el) return;
+        el.addEventListener("click", () => { window.location.href = url; });
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            window.location.href = url;
+          }
+        });
+      };
+
+      bindNavCard(".leafCard--profile", "yh_portfolio_profile.html");
+      bindNavCard(".leafCard--portfolio", "yh_portfolio_portfolio.html");
+      bindNavCard(".leafCard--skills", "yh_portfolio_skills.html");
+      bindNavCard(".leafCard--contact", "yh_portfolio_contact.html");
+    })();
+  </script>
+</body>
+</html>

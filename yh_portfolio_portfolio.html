@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポートフォリオ（リンク掲載ページ・見開き1300×高さ630版）</title>
+  <style>
+    :root {
+      --warm-bg: linear-gradient(135deg, #fff6e9 0%, #ffe5cc 100%);
+      --deep-orange: #f07c2c;
+      --soft-orange: #ffb782;
+      --pale-orange: #ffe0c7;
+      --text-main: #5a3c2c;
+      --muted-text: #7a5a42;
+      --panel-bg: #fffaf4;
+      --shadow: 0 14px 38px rgba(120, 70, 30, 0.14);
+    
+      --book-move-dur: 1100ms; /* 本の移動・拡張の速度 */
+      --cover-turn-dur: 1100ms; /* 表紙の開閉 */
+      --page-turn-dur: 1100ms;  /* 表紙→各状態のめくり */
+      --page-turn-inner-dur: 1350ms; /* 見開き内（B↔Cなど）の柔らかいめくり */
+      --spread-exit-dur: 680ms; /* 見開き→他ページ遷移のめくり */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: var(--warm-bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .stage {
+      width: 1440px;
+      height: 910px;
+      background: var(--warm-bg);
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(110, 60, 20, 0.16);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header {
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      border-bottom: 1px solid rgba(120, 70, 30, 0.12);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* ヘッダーでリンクが2行化しないよう、ナビ全体を必要時に2段目へ移す */
+    nav {
+      display: flex;
+      gap: 12px 16px;
+      flex: 1 1 640px;
+      min-width: 520px;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      order: 2;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffcf9f, #f07c2c);
+      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.6);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      margin-left: 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      transition: background 0.3s ease, color 0.3s ease;
+      white-space: nowrap;
+    }
+
+    nav a:hover,
+    nav a:focus-visible {
+      background: rgba(240, 124, 44, 0.12);
+      outline: none;
+      color: var(--deep-orange);
+    }
+
+    nav a[aria-current="page"]{
+      background: rgba(240, 124, 44, 0.16);
+      color: var(--deep-orange);
+    }
+
+    .main {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 650px 1fr 220px;
+      padding: 12px 20px 8px;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .donut-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut svg {
+      width: 630px;
+      height: 630px;
+      filter: drop-shadow(0 12px 26px rgba(110, 60, 20, 0.14));
+    }
+
+    .instruction {
+      position: absolute;
+      text-align: center;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: #fff6ec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: inset 0 4px 12px rgba(255, 255, 255, 0.4), 0 6px 20px rgba(120, 70, 30, 0.18);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .instruction span {
+      font-size: 14px;
+      color: var(--muted-text);
+      letter-spacing: 0.4px;
+    }
+
+    /* パネルのアニメーションと右寄せ調整（clip-pathで三角から開く） */
+    .content-panel {
+      position: absolute;
+      width: 1080px;
+      height: 630px;
+      right: 48px;
+      left: auto;
+      top: 50%;
+      transform: translateY(-50%) scale(0.25);
+      transform-origin: center;
+      background: var(--panel-bg);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      padding: 32px 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 6;
+      --clip-x: 540px;
+      --clip-y: 315px;
+      --clip-size: 26px;
+      clip-path: polygon(var(--clip-x) var(--clip-y), calc(var(--clip-x) + var(--clip-size)) var(--clip-y), var(--clip-x) calc(var(--clip-y) + var(--clip-size)));
+      transition: transform 0.45s ease, opacity 0.45s ease, border-radius 0.45s ease, left 0.45s ease, top 0.45s ease, right 0.45s ease, clip-path 0.45s ease;
+    }
+
+    .content-panel.active {
+      transform: translateY(-50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+      clip-path: inset(0 0 0 0 round 28px);
+    }
+
+    .content-panel h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 1px;
+      color: var(--text-main);
+    }
+
+    .content-panel ul {
+      margin: 6px 0 0;
+      padding-left: 18px;
+      color: var(--muted-text);
+      line-height: 1.6;
+    }
+
+    .content-panel p {
+      margin: 6px 0 0;
+      color: var(--muted-text);
+      line-height: 1.5;
+    }
+
+    .close-btn {
+      margin-top: auto;
+      align-self: flex-end;
+      background: var(--deep-orange);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(240, 124, 44, 0.26);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(240, 124, 44, 0.32);
+      outline: none;
+    }
+
+    .close-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(240, 124, 44, 0.22);
+    }
+
+    .right-buttons,
+    .bottom-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .bottom-buttons {
+      flex-direction: row;
+      justify-content: center;
+      padding: 0 32px;
+    }
+
+    .nav-button {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #ffd3a6, #f28f42);
+      color: var(--text-main);
+      text-align: center;
+      padding: 18px 14px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    footer.bottom-bar .bottom-buttons .nav-button {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    footer.bottom-bar .nav-button{
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .nav-button:hover,
+    .nav-button:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
+      outline: none;
+    }
+
+    .nav-button:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
+    }
+
+    .main-background-dim {
+      position: absolute;
+      inset: 0;
+      background: rgba(90, 52, 30, 0.1);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 4;
+    }
+
+    .main-background-dim.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .right-buttons-area {
+      padding: 24px 10px 24px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 3;
+    }
+
+    /* 右の3ボタンを左寄せにシフト */
+    .right-buttons {
+      width: 300px;
+      transform: translateX(-200px);
+    }
+
+    .bottom-bar {
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 6px;
+      background: rgba(255, 214, 179, 0.45);
+      border-top: 1px solid rgba(120, 70, 30, 0.12);
+    }
+
+    .bottom-bar { position: relative; }
+
+    .nav-button--to-top{
+      position: absolute;
+      right: 40px;
+      bottom: 18px;
+      width: 220px;
+    }
+
+    .donut .segment {
+      transition: filter 0.2s ease, transform 0.2s ease, fill 0.25s ease, stroke 0.2s ease;
+      cursor: pointer;
+      outline: none;
+      stroke: rgba(90, 60, 40, 0.2);
+      stroke-width: 1.2;
+      pointer-events: auto;
+    }
+
+    .donut .segment:hover,
+    .donut .segment:focus-visible {
+      filter: brightness(0.85);
+      stroke: rgba(90, 60, 40, 0.4);
+    }
+
+    .donut .segment:focus-visible {
+      transform: translateY(-1px);
+    }
+
+    .donut .segment.active,
+    .donut .segment.active:hover,
+    .donut .segment.active:focus-visible {
+      filter: brightness(1.05);
+      transform: none;
+      stroke: rgba(240, 124, 44, 0.6);
+    }
+
+    /* 白三角（展開アイコン）の当たり判定付きスタイル */
+    .donut .triangle {
+      fill: #fff;
+      stroke: rgba(240, 124, 44, 0.28);
+      stroke-width: 1.2;
+      filter: drop-shadow(0 4px 8px rgba(120, 70, 30, 0.08));
+      pointer-events: auto;
+    }
+
+    .donut .triangle.active {
+      stroke: rgba(240, 124, 44, 0.6);
+    }
+
+    .segment-pulse {
+      animation: segmentPulse 0.35s ease;
+    }
+
+    @keyframes segmentPulse {
+      0% {
+        filter: brightness(1);
+        transform: scale(1);
+      }
+      60% {
+        filter: brightness(1.15);
+        transform: scale(1.04);
+      }
+      100% {
+        filter: brightness(1);
+        transform: scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto !important;
+        animation-duration: 0ms !important;
+        transition-duration: 0ms !important;
+      }
+
+      .content-panel {
+        clip-path: inset(0 0 0 0 round 28px);
+        transform: translateY(-50%) scale(0.25);
+      }
+
+      .content-panel.active {
+        transform: translateY(-50%) scale(1);
+      }
+
+      /* 動きの軽減時は見開き→他ページ演出も無効化 */
+      .book.is-navigating .pages,
+      .book.is-navigating .pages::before {
+        animation: none !important;
+      }
+    }
+  
+
+    /* ===== ポートフォリオリンク掲載ページ（本UI） 追加スタイル ===== */
+.stage[aria-label="ポートフォリオリンク掲載ページ"] .main {
+  /* mainエリア（指定：1365×650） */
+  width: 1365px;
+  height: 650px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  display: block;
+
+  /* 本UIが右カードに重なれるようにする（右カードは背面に残る） */
+  overflow: visible;
+}
+
+.stage[aria-label="ポートフォリオリンク掲載ページ"] .book-area {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  z-index: 4; /* 右カードより前面 */
+  pointer-events: none; /* 本以外は背面クリックを阻害しない */
+}
+
+.stage[aria-label="ポートフォリオリンク掲載ページ"] .right-buttons-area {
+  /* 右カードは背面に残す（本が上にかぶさってOK） */
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 650px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+    .right-buttons-area {
+      z-index: 2; /* 本UIの背面 */
+    }
+
+    .book {
+  /* 指定：
+   * - 本の高さ：630px
+   * - 見開き幅：1300px
+   * - 閉じた幅：630px（のりしろ40px想定は、見開き時の中央「綴じ」幅で表現）
+   */
+  position: absolute;
+  top: 50%;
+  left: 20px;
+
+  width: 630px;
+  height: 630px;
+
+  perspective: 1400px;
+  user-select: none;
+  transform: translateY(-50%);
+  transition:
+    left var(--book-move-dur) cubic-bezier(0.22, 1, 0.36, 1),
+    width var(--book-move-dur) cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--book-move-dur) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: left, width, transform;
+  pointer-events: auto;
+}
+
+.book[data-state="spread"],
+.book[data-state="detail"] {
+  left: 50%;
+  width: 1300px;
+  height: 630px;
+  transform: translate(-50%, -50%);
+}
+
+    .book-surface {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      box-shadow: 0 16px 34px rgba(120, 70, 30, 0.18);
+      transform-style: preserve-3d;
+    }
+
+    /* しおり（Bookmark） */
+    .bookmark {
+      position: absolute;
+      top: 110px;
+      right: -18px;
+      width: 42px;
+      height: 150px;
+      border: none;
+      cursor: pointer;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(245, 116, 72, 0.95), rgba(184, 58, 26, 0.95));
+      box-shadow: 0 10px 18px rgba(80, 40, 16, 0.22);
+      color: rgba(255,255,255,0.96);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      z-index: 20;
+    }
+    .bookmark:focus-visible {
+      outline: 3px solid rgba(255,255,255,0.72);
+      outline-offset: 3px;
+    }
+
+    /* 表紙 */
+    .cover {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background:
+        radial-gradient(1200px 680px at 40% 20%, rgba(255,255,255,0.45), rgba(255,255,255,0) 55%),
+        linear-gradient(135deg, rgba(140, 92, 52, 0.95), rgba(78, 44, 24, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        inset 0 0 0 1px rgba(0,0,0,0.14),
+        inset 0 20px 40px rgba(255,255,255,0.08);
+      transform-origin: left center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: rotateY(0deg);
+      transition: transform var(--cover-turn-dur) cubic-bezier(0.22, 1, 0.36, 1), filter var(--cover-turn-dur) cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease 320ms;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      padding: 34px 40px;
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    .cover-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .cover-title h1 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: 0.04em;
+    }
+
+    .cover-title .subtitle {
+      opacity: 0.92;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .featured-list {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .featured-item {
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 8px 16px rgba(20, 10, 6, 0.18);
+      transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .featured-item:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.13);
+      box-shadow: 0 10px 20px rgba(20, 10, 6, 0.22);
+    }
+
+    .featured-item .title {
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .featured-item .desc {
+      font-size: 13px;
+      opacity: 0.94;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .cover-hint {
+      padding-top: 14px;
+      font-size: 12px;
+      opacity: 0.86;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .cover-hint .arrow {
+      font-weight: 900;
+      opacity: 0.95;
+    }
+
+    /* 見開き（ページ） */
+.pages {
+  position: absolute;
+  inset: 0;
+
+  /* 見開き時：630 + 40（綴じ） + 630 = 1300 を意識 */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+
+  /* 余計な外側余白を消して「pages が book の中に納まる」を優先 */
+  padding: 0;
+
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78)),
+    linear-gradient(135deg, rgba(255, 236, 216, 0.42), rgba(255, 255, 255, 0));
+  /* border を使うと中身寸法がズレるため、擬似の枠線に寄せる */
+  border: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(120, 70, 30, 0.12),
+    inset 0 0 0 2px rgba(255,255,255,0.55),
+    inset 0 26px 34px rgba(120, 70, 30, 0.08);
+  z-index: 1;
+
+  overflow: hidden;
+}
+
+    .pages::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        linear-gradient(90deg,
+          rgba(90, 52, 30, 0.12) 0%,
+          rgba(90, 52, 30, 0.00) 18%,
+          rgba(255,255,255,0.00) 50%,
+          rgba(90, 52, 30, 0.00) 82%,
+          rgba(90, 52, 30, 0.10) 100%
+        );
+    }
+
+    .page {
+      border-radius: 18px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(120, 70, 30, 0.10);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65);
+      padding: 18px 18px 14px;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(120, 70, 30, 0.12);
+    }
+
+    .page-header h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+    }
+
+    .mini-btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 16px rgba(120, 70, 30, 0.14);
+      color: rgba(80, 40, 16, 0.92);
+      font-weight: 800;
+      font-size: 12px;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      white-space: nowrap;
+    }
+
+    .mini-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(120, 70, 30, 0.18);
+    }
+
+    
+    /* 見開き一覧（状態B）用：表紙と同じ雰囲気の「縦並びカード」（背景は白） */
+    .spread-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .spread-item {
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(120, 70, 30, 0.14);
+      box-shadow: 0 10px 20px rgba(120, 70, 30, 0.10);
+      transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+    }
+
+    .spread-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 26px rgba(120, 70, 30, 0.14);
+      background: rgba(255, 246, 238, 0.95);
+    }
+
+    .spread-item .title {
+      font-weight: 900;
+      font-size: 16px;
+      color: rgba(65, 30, 12, 0.92);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .spread-item .desc {
+      font-size: 13.5px;
+      color: rgba(65, 30, 12, 0.78);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .spread-item .chips {
+      margin-top: 10px;
+    }
+
+    /* 本が開いている時は、本文を少し大きめに（左右ページに説明を書きやすくする） */
+    .book[data-state="spread"] .page-header h2,
+    .book[data-state="detail"] .page-header h2 {
+      font-size: 18px;
+    }
+
+    .book[data-state="detail"] .detail h3 {
+      font-size: 18px;
+    }
+
+    .book[data-state="detail"] .detail p {
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .work-card {
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 12px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.72));
+      border: 1px solid rgba(120, 70, 30, 0.12);
+      box-shadow: 0 10px 20px rgba(120, 70, 30, 0.12);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .work-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 24px rgba(120, 70, 30, 0.16);
+    }
+    .work-card .t {
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(65, 30, 12, 0.92);
+      line-height: 1.35;
+    }
+    .work-card .s {
+      font-size: 12px;
+      color: rgba(65, 30, 12, 0.78);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* チップ（Chip） */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(65, 30, 12, 0.86);
+      background: rgba(255, 246, 238, 0.95);
+      border: 1px solid rgba(120, 70, 30, 0.12);
+      box-shadow: 0 8px 14px rgba(120, 70, 30, 0.10);
+    }
+
+    .detail {
+      overflow: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .detail h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .detail p {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: rgba(65, 30, 12, 0.82);
+      white-space: pre-wrap;
+    }
+
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ghost-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(120, 70, 30, 0.26);
+      background: rgba(255,255,255,0.6);
+      color: rgba(65, 30, 12, 0.82);
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    /* 状態制御 */
+
+    /* 開いた状態の紙面は白基調に寄せる（状態B/C） */
+    .book[data-state="spread"] .page,
+    .book[data-state="detail"] .page {
+      background: rgba(255,255,255,0.92);
+    }
+
+    .book[data-state="cover"] .pages {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .book[data-state="cover"] .cover {
+      filter: none;
+    }
+
+    .book[data-state="spread"] .pages,
+    .book[data-state="detail"] .pages {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .book[data-state="spread"] .cover,
+    .book[data-state="detail"] .cover {
+      transform: rotateY(-172deg);
+      filter: brightness(0.95);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .book.is-spread-exiting .pages {
+      transform: scale(0.995);
+      filter: brightness(0.97);
+      transition: transform var(--spread-exit-dur) ease, filter var(--spread-exit-dur) ease;
+    }
+
+    /* “ページがめくれる”演出（簡易） */
+    .book.is-turning .pages {
+      animation: pageTurn var(--page-turn-dur) cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* 見開き内の柔らかいめくり（B↔Cなど） */
+    .book.is-page-turning .pages {
+      animation: pageTurnSoft var(--page-turn-inner-dur) cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .book.is-turning .pages::after {
+      animation: curlShade var(--page-turn-dur) cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .book.is-page-turning .pages::after {
+      animation: curlShadeSoft var(--page-turn-inner-dur) cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes pageTurn {
+      0% {
+        transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
+        filter: brightness(1);
+      }
+      32% {
+        transform: translateX(12px) rotateY(-8deg) skewY(-1.1deg) scale(0.995);
+        filter: brightness(0.985);
+      }
+      62% {
+        transform: translateX(-4px) rotateY(5deg) skewY(0.6deg) scale(0.998);
+        filter: brightness(0.995);
+      }
+      100% {
+        transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
+        filter: brightness(1);
+      }
+    }
+
+    @keyframes pageTurnSoft {
+      0% {
+        transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
+        filter: brightness(1);
+      }
+      26% {
+        transform: translateX(8px) rotateY(-5deg) skewY(-0.6deg) scale(0.997);
+        filter: brightness(0.992);
+      }
+      56% {
+        transform: translateX(-3px) rotateY(3deg) skewY(0.35deg) scale(0.999);
+        filter: brightness(0.997);
+      }
+      82% {
+        transform: translateX(1px) rotateY(-1deg) skewY(-0.12deg) scale(1);
+        filter: brightness(1);
+      }
+      100% {
+        transform: translateX(0) rotateY(0deg) skewY(0deg) scale(1);
+        filter: brightness(1);
+      }
+    }
+
+    @keyframes curlShadeSoft {
+      0% { opacity: 0; }
+      30% { opacity: 0.38; }
+      62% { opacity: 0.22; }
+      100% { opacity: 0; }
+    }
+
+    /* 見開き→他ページ遷移専用のオーバーレイページめくり演出（表紙とは分離） */
+    #spreadTurnOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      perspective: 1200px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 80ms ease;
+    }
+
+    #spreadTurnOverlay.is-active {
+      opacity: 1;
+    }
+
+    #spreadTurnOverlay .turnPage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.9)),
+        linear-gradient(135deg, rgba(255,240,225,0.55), rgba(255,255,255,0.96));
+      box-shadow:
+        -4px 0 14px rgba(0, 0, 0, 0.16);
+      border-radius: 18px;
+      transform-origin: left center;
+      transform: rotateY(0deg);
+      will-change: transform, box-shadow, filter;
+      overflow: hidden;
+    }
+
+    #spreadTurnOverlay .turnPage::before,
+    #spreadTurnOverlay .turnPage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    #spreadTurnOverlay .turnPage::before {
+      background: linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0));
+      opacity: 0;
+      mix-blend-mode: multiply;
+    }
+
+    #spreadTurnOverlay .turnPage::after {
+      background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0));
+      opacity: 0;
+    }
+
+    #spreadTurnOverlay .turnPage.is-flipping {
+      animation: spreadPageFlipOut 650ms ease-in-out forwards;
+    }
+    #spreadTurnOverlay .turnPage.is-flipping::before {
+      animation: spreadPageShadow 650ms ease-in-out forwards;
+    }
+    #spreadTurnOverlay .turnPage.is-flipping::after {
+      animation: spreadPageHighlight 650ms ease-in-out forwards;
+    }
+
+    @keyframes spreadPageFlipOut {
+      0% {
+        transform: rotateY(0deg);
+        filter: brightness(1);
+        box-shadow:
+          -4px 0 14px rgba(0, 0, 0, 0.16);
+      }
+      35% {
+        transform: rotateY(-60deg);
+        filter: brightness(0.98);
+        box-shadow:
+          -8px 0 22px rgba(0, 0, 0, 0.20);
+      }
+      70% {
+        transform: rotateY(-120deg);
+        filter: brightness(0.95);
+        box-shadow:
+          -14px 0 30px rgba(0, 0, 0, 0.24);
+      }
+      100% {
+        transform: rotateY(-165deg);
+        filter: brightness(0.9);
+        box-shadow:
+          -18px 0 38px rgba(0, 0, 0, 0.26);
+      }
+    }
+
+    @keyframes spreadPageShadow {
+      0% { opacity: 0; }
+      32% { opacity: 0.55; }
+      60% { opacity: 0.72; }
+      82% { opacity: 0.42; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes spreadPageHighlight {
+      0% { opacity: 0; }
+      28% { opacity: 0.42; }
+      60% { opacity: 0.22; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes curlShade {
+      0% { opacity: 0; }
+      28% { opacity: 0.55; }
+      62% { opacity: 0.32; }
+      100% { opacity: 0; }
+    }
+
+    /* 見た目だけの補助線（本の綴じ） */
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 40px; /* のりしろ（綴じ）想定 */
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg,
+      rgba(120, 70, 30, 0.12) 0%,
+      rgba(120, 70, 30, 0.04) 35%,
+      rgba(255,255,255,0.05) 50%,
+      rgba(120, 70, 30, 0.04) 65%,
+      rgba(120, 70, 30, 0.10) 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.65),
+    inset 0 0 18px rgba(120, 70, 30, 0.10);
+  z-index: 2;
+  pointer-events: none;
+}
+
+  </style>
+</head>
+<body>
+  <div class="stage" aria-label="ポートフォリオリンク掲載ページ">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>YH Creative Studio</div>
+      </div>
+      <nav aria-label="ページ遷移">
+        <a href="yh_portfolio_profile.html">プロフィール (Profile)</a>
+        <a href="yh_portfolio_portfolio.html" aria-current="page">ポートフォリオ (Portfolio)</a>
+        <a href="yh_portfolio_skills.html">スキル (Skills)</a>
+        <a href="yh_portfolio_contact.html">お問い合わせ (Contact)</a>
+      </nav>
+    </header>
+
+    <div class="main" role="main">
+      <section class="book-area" aria-label="ポートフォリオ 本（Book）">
+        <div class="book" id="book" data-state="cover">
+          <button class="bookmark" id="bookmarkBtn" type="button" aria-label="一覧へ（Bookmark）を開く">一覧へ</button>
+
+          <div class="cover" id="cover" role="group" aria-label="表紙（注目3作品）">
+            <div class="cover-title">
+              <h1>PORTFOLIO</h1>
+              <div class="subtitle">状態A：表紙（注目3作品）</div>
+            </div>
+
+            <div class="featured-list" id="featuredList" aria-label="注目3作品 一覧">
+              <!-- JSで描画（作品名＋簡易説明：最大3行） -->
+            </div>
+
+            <div class="cover-hint" aria-hidden="true">
+              <span>作品行クリック：詳細へ（ページめくり演出）</span>
+              <span class="arrow">▶ 一覧へ：一覧へ</span>
+            </div>
+          </div>
+
+          <div class="pages" aria-label="見開きページ">
+            <div class="spine" aria-hidden="true"></div>
+
+            <div class="page" role="group" aria-label="左ページ">
+              <div class="page-header">
+                <h2 id="leftTitle">状態B：見開き一覧（最大6作品）</h2>
+                <button class="mini-btn" id="toCoverBtn" type="button">表紙へ戻る</button>
+              </div>
+
+              <div id="spreadLeft">
+                <!-- JSで描画（作品カード：最大6件） -->
+              </div>
+            </div>
+
+            <div class="page" id="rightPage" role="group" aria-label="右ページ">
+              <div class="page-header">
+                <h2 id="rightTitle">状態説明</h2>
+                <button class="mini-btn" id="toSpreadBtn" type="button">一覧へ戻る</button>
+              </div>
+
+              <div id="spreadRight">
+                <!-- JSで描画（詳細ページ／補足など） -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="center-placeholder" aria-hidden="true"></div>
+
+      <div class="right-buttons-area">
+        <div class="right-buttons" id="rightButtons" aria-label="右カード（遷移ボタン）">
+          <a class="nav-button" href="yh_portfolio_profile.html">プロフィール (Profile) へ戻る</a>
+          <a class="nav-button" href="yh_portfolio_skills.html">スキル (Skills) を見る</a>
+          <a class="nav-button" href="yh_portfolio_contact.html">お問い合わせ (Contact) へ</a>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bottom-bar" aria-label="ボトムバー">
+      <div class="bottom-buttons">
+        <a class="nav-button" href="yh_portfolio_profile.html">プロフィール (Profile) へ戻る</a>
+        <a class="nav-button" href="yh_portfolio_skills.html">スキル (Skills) を見る</a>
+        <a class="nav-button" href="yh_portfolio_contact.html">お問い合わせ (Contact) へ</a>
+      </div>
+    </footer>
+  </div>
+
+
+  <script>
+    /**
+     * ポートフォリオリンク掲載ページ：状態制御
+     * - 状態A：表紙（注目3作品）
+     * - 状態B：見開き一覧（最大6作品）
+     * - 状態C：作品詳細ページ
+     *
+     * ※リンク先ページ／ダウンロードリンクは現段階で未作成のため、後工程でここにURLを記述する。
+     *   - works[].pageUrl     : 作品ページURL（任意）
+     *   - works[].downloadUrl : ダウンロードURL（任意）
+     */
+    const book = document.getElementById('book');
+    const featuredList = document.getElementById('featuredList');
+    const spreadLeft = document.getElementById('spreadLeft');
+    const spreadRight = document.getElementById('spreadRight');
+    const leftTitle = document.getElementById('leftTitle');
+    const rightTitle = document.getElementById('rightTitle');
+    const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const bookmarkBtn = document.getElementById('bookmarkBtn');
+    const toCoverBtn = document.getElementById('toCoverBtn');
+    const toSpreadBtn = document.getElementById('toSpreadBtn');
+    const spreadNavDuration = 650;
+    let spreadNavigationInFlight = false;
+
+    // 表紙→見開き演出に関係する識別子（見開き→他ページでは使用しない）
+    // クラス: is-turning / is-page-turning
+    // キーフレーム: pageTurn / curlShade / pageTurnSoft / curlShadeSoft
+    // JS: turnAnimation()
+
+    // 仮データ（後工程で差し替え）
+    const works = [
+      {
+        id: 'work-01',
+        title: '作品A（仮）',
+        short: '短い説明（仮）。どんな課題をどう解いたかを一言で。',
+        tags: ['カテゴリ：UI', '役割：設計'],
+        detail:
+`ここに作品の詳細説明を記述します（仮）。
+・背景 / 課題
+・対応内容
+・工夫点
+・結果 / 学び
+（後工程で実データに差し替え）`,
+        // TODO: 作品ページURL（任意）をここに記述
+        pageUrl: '',
+        // TODO: ダウンロードURL（任意）をここに記述
+        downloadUrl: ''
+      },
+      {
+        id: 'work-02',
+        title: '作品B（仮）',
+        short: '短い説明（仮）。3行以内で要点をまとめる。',
+        tags: ['カテゴリ：Web', '役割：実装'],
+        detail:
+`ここに作品の詳細説明を記述します（仮）。
+（後工程で実データに差し替え）`,
+        // TODO: 作品ページURL（任意）をここに記述
+        pageUrl: '',
+        // TODO: ダウンロードURL（任意）をここに記述
+        downloadUrl: ''
+      },
+      {
+        id: 'work-03',
+        title: '作品C（仮）',
+        short: '短い説明（仮）。想定ユーザーと目的が伝わる書き方に。',
+        tags: ['カテゴリ：資料', '役割：構成'],
+        detail:
+`ここに作品の詳細説明を記述します（仮）。
+（後工程で実データに差し替え）`,
+        // TODO: 作品ページURL（任意）をここに記述
+        pageUrl: '',
+        // TODO: ダウンロードURL（任意）をここに記述
+        downloadUrl: ''
+      },
+      {
+        id: 'work-04',
+        title: '作品D（仮）',
+        short: '短い説明（仮）。',
+        tags: ['カテゴリ：UI'],
+        detail:
+`ここに作品の詳細説明を記述します（仮）。`,
+        // TODO: 作品ページURL（任意）をここに記述
+        pageUrl: '',
+        // TODO: ダウンロードURL（任意）をここに記述
+        downloadUrl: ''
+      },
+      {
+        id: 'work-05',
+        title: '作品E（仮）',
+        short: '短い説明（仮）。',
+        tags: ['カテゴリ：Web'],
+        detail:
+`ここに作品の詳細説明を記述します（仮）。`,
+        // TODO: 作品ページURL（任意）をここに記述
+        pageUrl: '',
+        // TODO: ダウンロードURL（任意）をここに記述
+        downloadUrl: ''
+      },
+      {
+        id: 'work-06',
+        title: '作品F（仮）',
+        short: '短い説明（仮）。',
+        tags: ['カテゴリ：資料'],
+        detail:
+`ここに作品の詳細説明を記述します（仮）。`,
+        // TODO: 作品ページURL（任意）をここに記述
+        pageUrl: '',
+        // TODO: ダウンロードURL（任意）をここに記述
+        downloadUrl: ''
+      }
+    ];
+
+    const featured = ['work-01', 'work-02', 'work-03']; // 表紙：注目3作品
+
+    function setState(next) {
+      book.setAttribute('data-state', next);
+    }
+
+    function clearLegacyNavigationState() {
+      book.classList.remove('is-navigating');
+    }
+
+    function turnAnimation(fn, kind = 'cover') {
+      const coverDur = 1100;
+      const innerDur = 1350;
+      const isInner = (kind === 'inner');
+      const cls = isInner ? 'is-page-turning' : 'is-turning';
+      const dur = isInner ? innerDur : coverDur;
+
+      // 連打・状態切替のズレ防止
+      book.classList.remove('is-turning', 'is-page-turning');
+      book.classList.add(cls);
+
+      window.setTimeout(() => {
+        fn();
+        window.setTimeout(() => book.classList.remove(cls), dur + 60);
+      }, 10);
+    }
+
+
+    function renderCover() {
+      setState('cover');
+      clearLegacyNavigationState();
+      toSpreadBtn.style.visibility = 'hidden';
+      featuredList.innerHTML = '';
+      featured.forEach((id) => {
+        const w = works.find(x => x.id === id);
+        const row = document.createElement('div');
+        row.className = 'featured-item';
+        row.setAttribute('role', 'button');
+        row.setAttribute('tabindex', '0');
+        row.innerHTML = `
+          <div class="title">${escapeHtml(w.title)}</div>
+          <div class="desc">${escapeHtml(w.short)}</div>
+        `;
+        row.addEventListener('click', () => {
+          turnAnimation(() => renderDetail(w.id, 'cover'), 'cover');
+        });
+        row.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            turnAnimation(() => renderDetail(w.id, 'cover'), 'cover');
+          }
+        });
+        featuredList.appendChild(row);
+      });
+
+      // 表紙では「一覧へ戻る」ボタンは実質不要だが、状態統一のため残す
+      rightTitle.textContent = '状態説明';
+      spreadLeft.innerHTML = '';
+      spreadRight.innerHTML = `
+        <div class="detail">
+          <p>
+表紙（状態A）では、注目3作品を縦並び表示します。
+作品行クリックで詳細（状態C）へ遷移します。
+一覧へ（Bookmark）クリックで一覧（状態B）へ遷移します。
+          </p>
+        </div>
+      `;
+    }
+
+    
+    function renderSpread() {
+      setState('spread');
+      clearLegacyNavigationState();
+
+      // 見開き一覧は左右ページ合計で最大6件（運用で6件超にしない）
+      const max = 6;
+      const list = works.slice(0, max);
+      const leftItems = list.slice(0, 3);
+      const rightItems = list.slice(3, 6);
+
+      leftTitle.textContent = '状態B：見開き一覧（最大6作品）';
+      rightTitle.textContent = '状態B：見開き一覧（最大6作品）';
+
+      // 一覧中は「一覧へ戻る」ボタンは不要なので非表示（表紙へ戻るは左ページ上部に残す）
+      toSpreadBtn.style.visibility = 'hidden';
+
+      spreadLeft.innerHTML = `
+        <div class="spread-list" aria-label="見開き一覧（左ページ）">
+          ${leftItems.map(w => `
+            <div class="spread-item" role="button" tabindex="0" data-id="${w.id}">
+              <div class="title">${escapeHtml(w.title)}</div>
+              <div class="desc">${escapeHtml(w.short)}</div>
+              ${w.tags?.length ? `
+                <div class="chips" aria-label="タグ（任意）">
+                  ${w.tags.slice(0, 2).map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
+                </div>
+              ` : ``}
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      spreadRight.innerHTML = rightItems.length ? `
+        <div class="spread-list" aria-label="見開き一覧（右ページ）">
+          ${rightItems.map(w => `
+            <div class="spread-item" role="button" tabindex="0" data-id="${w.id}">
+              <div class="title">${escapeHtml(w.title)}</div>
+              <div class="desc">${escapeHtml(w.short)}</div>
+              ${w.tags?.length ? `
+                <div class="chips" aria-label="タグ（任意）">
+                  ${w.tags.slice(0, 2).map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
+                </div>
+              ` : ``}
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div class="detail" aria-label="空きページ">
+          <p>（作品が3件以下のため、右ページは空き領域です。）</p>
+        </div>
+      `;
+
+      // クリック / キーボード（Enter/Space）で詳細へ
+      const bind = (root) => {
+        root.querySelectorAll('[data-id]').forEach((el) => {
+          const id = el.getAttribute('data-id');
+          el.addEventListener('click', () => turnAnimation(() => renderDetail(id, 'spread'), 'inner'));
+          el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              turnAnimation(() => renderDetail(id, 'spread'), 'inner');
+            }
+          });
+        });
+      };
+      bind(spreadLeft);
+      bind(spreadRight);
+    }
+
+    
+    function renderDetail(workId, from) {
+      setState('detail');
+      clearLegacyNavigationState();
+      const w = works.find(x => x.id === workId);
+
+      // 詳細表示中は「一覧へ戻る」ボタンを表示（右ページ上部）
+      toSpreadBtn.style.visibility = 'visible';
+
+      leftTitle.textContent = '作品名とリンク';
+      rightTitle.textContent = '細かい説明（状態C）';
+
+      // ※リンク先は未作成のため、後工程で works[].pageUrl / downloadUrl にURLを入れる
+      const pageLink = w.pageUrl
+        ? `<a class="nav-button" href="${w.pageUrl}" style="text-decoration:none; text-align:center; padding: 12px 14px;">作品ページへ（任意）</a>`
+        : `<div class="ghost-link">作品ページリンク（任意）<span>後工程でURLを記述</span></div>`;
+
+      const downloadLink = w.downloadUrl
+        ? `<a class="nav-button" href="${w.downloadUrl}" style="text-decoration:none; text-align:center; padding: 12px 14px;">ダウンロード（任意）</a>`
+        : `<div class="ghost-link">ダウンロードリンク（任意）<span>後工程でURLを記述</span></div>`;
+
+      // 左ページ：作品名＋タグ（チップ（Chip））＋リンク
+      spreadLeft.innerHTML = `
+        <div class="detail" aria-label="作品名とリンク">
+          <h3>${escapeHtml(w.title)}</h3>
+
+          <div class="chips" aria-label="管理用タグ（チップ（Chip））">
+            ${w.tags.map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
+          </div>
+
+          <p>${escapeHtml(w.short)}</p>
+
+          <h3>リンク</h3>
+          <div class="link-list" aria-label="リンク群（任意）">
+            <!-- TODO: 作品ページURL（任意）を works[].pageUrl に記述 -->
+            ${pageLink}
+            <!-- TODO: ダウンロードURL（任意）を works[].downloadUrl に記述 -->
+            ${downloadLink}
+          </div>
+        </div>
+      `;
+
+      // 右ページ：詳細説明（選ばれた項目のみ）
+      spreadRight.innerHTML = `
+        <div class="detail" aria-label="作品の詳細説明">
+          <h3>説明</h3>
+          <p>${escapeHtml(w.detail)}</p>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    // 操作：しおり（Bookmark）クリック → 状態B
+    bookmarkBtn.addEventListener('click', () => {
+      const st = book.getAttribute('data-state');
+      // 表紙（状態A）→一覧（状態B）は表紙の開閉、見開き内は柔らかいめくり
+      turnAnimation(renderSpread, (st === 'cover') ? 'cover' : 'inner');
+    });
+    // 操作：表紙へ戻る
+    toCoverBtn.addEventListener('click', () => turnAnimation(renderCover, 'cover'));
+    // 操作：一覧へ戻る
+    toSpreadBtn.addEventListener('click', () => {
+      // 見開き内（状態C→B）は柔らかいめくり
+      turnAnimation(renderSpread, 'inner');
+    });
+
+    function ensureSpreadTurnOverlay() {
+      let overlay = document.getElementById('spreadTurnOverlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'spreadTurnOverlay';
+        overlay.setAttribute('aria-hidden', 'true');
+        const turnPage = document.createElement('div');
+        turnPage.className = 'turnPage';
+        overlay.appendChild(turnPage);
+        document.body.appendChild(overlay);
+      }
+      const turnPage = overlay.querySelector('.turnPage');
+      return { overlay, turnPage };
+    }
+
+    function playSpreadNavigation(url) {
+      const { overlay, turnPage } = ensureSpreadTurnOverlay();
+      const rightPageEl = document.getElementById('rightPage');
+      let hasNavigated = false;
+
+      const completeNavigation = () => {
+        if (hasNavigated) return;
+        hasNavigated = true;
+        book.classList.remove('is-spread-exiting');
+        window.location.href = url;
+      };
+
+      // 右ページ位置にオーバーレイを合わせる
+      if (rightPageEl) {
+        const rect = rightPageEl.getBoundingClientRect();
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+        const turnPageStyle = turnPage.style;
+        turnPageStyle.left = `${rect.left + scrollX}px`;
+        turnPageStyle.top = `${rect.top + scrollY}px`;
+        turnPageStyle.width = `${rect.width}px`;
+        turnPageStyle.height = `${rect.height}px`;
+        const rpComputed = window.getComputedStyle(rightPageEl);
+        turnPageStyle.borderRadius = rpComputed.borderRadius || '18px';
+      }
+
+      turnPage.classList.remove('is-flipping');
+      overlay.classList.remove('is-active');
+      void overlay.offsetWidth; // reflow to restart animation
+
+      requestAnimationFrame(() => {
+        overlay.classList.add('is-active');
+        book.classList.add('is-spread-exiting');
+        requestAnimationFrame(() => {
+          turnPage.classList.add('is-flipping');
+        });
+      });
+
+      const onEnd = (event) => {
+        if (event.animationName !== 'spreadPageFlipOut') return;
+        turnPage.removeEventListener('animationend', onEnd);
+        completeNavigation();
+      };
+
+      turnPage.addEventListener('animationend', onEnd);
+      window.setTimeout(completeNavigation, spreadNavDuration + 120);
+    }
+
+    // 見開きページから他ページへ移動する際のオーバーレイめくり演出（イベント委譲）
+    (function setupSpreadExitTurn() {
+      document.addEventListener('click', (event) => {
+        if (event.defaultPrevented) return;
+        if (event.button !== 0) return;
+        const navTarget = event.target.closest('[data-nav-href], a[href]:not([href^="#"])');
+        if (!navTarget) return;
+
+        // 新しいタブや修飾キー操作、ミドルクリックはブラウザ挙動を尊重
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1 || navTarget.target === '_blank') return;
+
+        const href = navTarget.dataset.navHref || navTarget.href;
+        if (!href || href === window.location.href) return;
+
+        // 見開き（状態B/C）のみで発火。表紙は従来演出のまま。
+        const state = book.getAttribute('data-state');
+        if (state === 'cover') return;
+        if (reduceMotionQuery.matches) return;
+
+        if (spreadNavigationInFlight) {
+          event.preventDefault();
+          return;
+        }
+        spreadNavigationInFlight = true;
+        event.preventDefault();
+
+        // 既存の表紙用クラスが残留していても演出が潰れないよう、念のため外す
+        book.classList.remove('is-turning', 'is-page-turning', 'is-navigating');
+        playSpreadNavigation(href);
+      });
+    })();
+
+    // 初期表示：表紙（状態A）
+    renderCover();
+  </script>
+
+</body>
+</html>

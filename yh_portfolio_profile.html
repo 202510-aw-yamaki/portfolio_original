@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YH Portfolio Profile</title>
+  <style>
+    :root {
+      --warm-bg: linear-gradient(135deg, #fff6e9 0%, #ffe5cc 100%);
+      --deep-orange: #f07c2c;
+      --soft-orange: #ffb782;
+      --pale-orange: #ffe0c7;
+      --text-main: #5a3c2c;
+      --muted-text: #7a5a42;
+      --panel-bg: #fffaf4;
+      --shadow: 0 14px 38px rgba(120, 70, 30, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: var(--warm-bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .stage {
+      width: 1440px;
+      height: 910px;
+      background: var(--warm-bg);
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(110, 60, 20, 0.16);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header {
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      border-bottom: 1px solid rgba(120, 70, 30, 0.12);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    nav {
+      display: flex;
+      gap: 12px 16px;
+      flex: 1 1 640px;
+      min-width: 520px;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      order: 2;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffcf9f, #f07c2c);
+      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.6);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      margin-left: 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      transition: background 0.3s ease, color 0.3s ease;
+      white-space: nowrap;
+    }
+
+    nav a:hover,
+    nav a:focus-visible {
+      background: rgba(240, 124, 44, 0.12);
+      outline: none;
+      color: var(--deep-orange);
+    }
+
+    nav a[aria-current="page"]{
+      background: rgba(240, 124, 44, 0.16);
+      color: var(--deep-orange);
+    }
+
+    .main {
+      position: relative;
+      height: 650px;
+      display: grid;
+      grid-template-columns: 520px 580px 340px;
+      padding: 24px 32px 12px;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .donut-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut svg {
+      width: 440px;
+      height: 440px;
+      filter: drop-shadow(0 10px 24px rgba(110, 60, 20, 0.14));
+    }
+
+    .donut path {
+      cursor: pointer;
+      transition: filter 0.2s ease;
+    }
+
+    .donut path:hover,
+    .donut path:focus-visible {
+      filter: brightness(0.85);
+      outline: none;
+    }
+
+    .instruction {
+      position: absolute;
+      text-align: center;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: #fff6ec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: inset 0 4px 12px rgba(255, 255, 255, 0.4), 0 6px 20px rgba(120, 70, 30, 0.18);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .instruction span {
+      font-size: 14px;
+      color: var(--muted-text);
+      letter-spacing: 0.4px;
+    }
+
+    .content-panel {
+      position: absolute;
+      width: 760px;
+      height: 520px;
+      left: 52%;
+      top: 48%;
+      transform: translate(-50%, -50%) scale(0.25);
+      transform-origin: center;
+      background: var(--panel-bg);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      padding: 32px 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 6;
+      transition: transform 0.45s ease, opacity 0.45s ease, border-radius 0.45s ease, left 0.45s ease, top 0.45s ease;
+    }
+
+    .content-panel.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .content-panel h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 1px;
+      color: var(--text-main);
+    }
+
+    .content-panel ul {
+      margin: 6px 0 0;
+      padding-left: 18px;
+      color: var(--muted-text);
+      line-height: 1.6;
+    }
+
+    .content-panel p {
+      margin: 6px 0 0;
+      color: var(--muted-text);
+      line-height: 1.5;
+    }
+
+    .close-btn {
+      margin-top: auto;
+      align-self: flex-end;
+      background: var(--deep-orange);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(240, 124, 44, 0.26);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(240, 124, 44, 0.32);
+      outline: none;
+    }
+
+    .close-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(240, 124, 44, 0.22);
+    }
+
+    .right-buttons,
+    .bottom-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .right-buttons {
+      width: 300px;
+      transform: translateX(-200px);
+    }
+
+    .bottom-buttons {
+      flex-direction: row;
+      justify-content: center;
+      padding: 0 32px;
+    }
+
+    .nav-button {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #ffd3a6, #f28f42);
+      color: var(--text-main);
+      text-align: center;
+      padding: 18px 14px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    footer.bottom-bar .bottom-buttons .nav-button {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    footer.bottom-bar .nav-button{
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .nav-button:hover,
+    .nav-button:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
+      outline: none;
+    }
+
+    .nav-button:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
+    }
+
+    .main-background-dim {
+      position: absolute;
+      inset: 0;
+      background: rgba(90, 52, 30, 0.1);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 4;
+    }
+
+    .main-background-dim.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .right-buttons-area {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 650px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .bottom-bar {
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 6px;
+      background: rgba(255, 214, 179, 0.45);
+      border-top: 1px solid rgba(120, 70, 30, 0.12);
+    }
+
+    .bottom-bar { position: relative; }
+
+    .nav-button--to-top{
+      position: absolute;
+      right: 40px;
+      bottom: 18px;
+      width: 220px;
+    }
+
+    .legend {
+      position: absolute;
+      bottom: 18px;
+      left: 48px;
+      font-size: 13px;
+      color: var(--muted-text);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip {
+      width: 14px;
+      height: 14px;
+      border-radius: 6px;
+      background: var(--soft-orange);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .chip.active {
+      background: var(--deep-orange);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto !important;
+        animation-duration: 0ms !important;
+        transition-duration: 0ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" aria-label="プロフィールページ">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>YH Creative Studio</div>
+      </div>
+      <nav aria-label="ページ遷移">
+        <a href="yh_portfolio_profile.html" aria-current="page">プロフィール (Profile)</a>
+        <a href="yh_portfolio_portfolio.html">ポートフォリオ (Portfolio)</a>
+        <a href="yh_portfolio_skills.html">スキル (Skills)</a>
+        <a href="yh_portfolio_contact.html">お問い合わせ (Contact)</a>
+      </nav>
+    </header>
+
+    <div class="main" role="main">
+      <div class="donut-area">
+        <div class="instruction" id="instruction">
+          <strong>クリックして選択</strong>
+          <span>左のリングからセクションを選んでください</span>
+        </div>
+        <svg class="donut" viewBox="0 0 440 440" aria-label="セクション メニュー" role="presentation"></svg>
+      </div>
+
+      <div class="main-background-dim" id="dim"></div>
+      <article class="content-panel" id="panel" aria-live="polite" aria-hidden="true">
+        <div>
+          <h2 id="panelTitle">セクションタイトル</h2>
+          <ul id="panelList"></ul>
+          <p id="panelNote"></p>
+        </div>
+        <button class="close-btn" id="closeBtn">閉じる</button>
+      </article>
+
+      <div class="center-placeholder" aria-hidden="true"></div>
+
+      <div class="right-buttons-area">
+        <div class="right-buttons" id="rightButtons">
+          <a class="nav-button" href="yh_portfolio_portfolio.html">ポートフォリオ (Portfolio) を見る</a>
+          <a class="nav-button" href="yh_portfolio_skills.html">スキル (Skills) を見る</a>
+          <a class="nav-button" href="yh_portfolio_contact.html">お問い合わせ (Contact) へ</a>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bottom-bar" aria-label="ボトムバー">
+      <div class="bottom-buttons">
+        <a class="nav-button" href="yh_portfolio_portfolio.html">ポートフォリオ (Portfolio) を見る</a>
+        <a class="nav-button" href="yh_portfolio_skills.html">スキル (Skills) を見る</a>
+        <a class="nav-button" href="yh_portfolio_contact.html">お問い合わせ (Contact) へ</a>
+      </div>
+    </footer>
+
+    <div class="legend" aria-hidden="true">
+      <span><span class="chip"></span> 未選択</span>
+      <span><span class="chip active"></span> 選択中</span>
+    </div>
+  </div>
+
+  <script>
+    const svg = document.querySelector('.donut');
+    const instruction = document.getElementById('instruction');
+    const panel = document.getElementById('panel');
+    const panelTitle = document.getElementById('panelTitle');
+    const panelList = document.getElementById('panelList');
+    const panelNote = document.getElementById('panelNote');
+    const closeBtn = document.getElementById('closeBtn');
+    const dim = document.getElementById('dim');
+    const rightButtons = document.getElementById('rightButtons');
+
+    const sections = [
+      {
+        key: '概要',
+        title: '概要 / About',
+        bullets: ['氏名: 山田太郎 / 29歳 / 東京在住', '希望職種: フロントエンドエンジニア', '3行サマリー: UI/UX志向・迅速な試作・丁寧な運用']
+      },
+      {
+        key: '経歴',
+        title: '経歴 / Career',
+        bullets: ['製造業: 生産ライン改善に従事 (2年)', '店舗運営: 接客・売場企画を担当 (3年)', '転身: Web開発へシフトし現職でUI改善に従事']
+      },
+      {
+        key: '実績',
+        title: '実績 / Works',
+        bullets: ['社内ポータルのUI刷新で離脱率20%改善', '受注管理画面のモバイル対応を主導', 'LP A/BテストでCVR+15%']
+      },
+      {
+        key: '強み',
+        title: '強み / Strength',
+        bullets: ['複雑な要件をビジュアルに整理', 'アクセシビリティ配慮の実装', 'デザイナー/企画との橋渡し']
+      },
+      {
+        key: '学習',
+        title: '学習 / Learning',
+        bullets: ['TypeScript + ReactでのUI開発', 'SVG/Canvasでのインタラクション設計', '色彩・タイポグラフィ設計を継続学習'],
+        note: '資格: 色彩検定2級 / TOEIC780'
+      },
+      {
+        key: '希望',
+        title: '希望 / Aspiration',
+        bullets: ['入社可能時期: 2024年6月以降', '勤務地: 首都圏 / リモート歓迎', '志向: 長期でUIを育てられる環境を希望'],
+        note: '働き方は柔軟に相談可能です。'
+      }
+    ];
+
+    const colors = ['#ffd9b3', '#ffbe9f', '#ffc79c', '#ffb782', '#ffc499', '#ffcf9f'];
+    const activeColor = '#f07c2c';
+
+    const center = { x: 220, y: 220, rOuter: 200, rInner: 120 };
+
+    const polarToCartesian = (cx, cy, r, angleDeg) => {
+      const rad = ((angleDeg - 90) * Math.PI) / 180;
+      return {
+        x: cx + r * Math.cos(rad),
+        y: cy + r * Math.sin(rad)
+      };
+    };
+
+    const describeArc = (cx, cy, r, startAngle, endAngle) => {
+      const start = polarToCartesian(cx, cy, r, endAngle);
+      const end = polarToCartesian(cx, cy, r, startAngle);
+      const large = endAngle - startAngle <= 180 ? '0' : '1';
+      return ['M', start.x, start.y, 'A', r, r, 0, large, 0, end.x, end.y].join(' ');
+    };
+
+    const buildRingPath = (startAngle, endAngle, outer, inner) => {
+      const outerArc = describeArc(center.x, center.y, outer, startAngle, endAngle);
+      const innerArc = describeArc(center.x, center.y, inner, endAngle, startAngle);
+      const startOuter = polarToCartesian(center.x, center.y, outer, endAngle);
+      const startInner = polarToCartesian(center.x, center.y, inner, endAngle);
+      const endInner = polarToCartesian(center.x, center.y, inner, startAngle);
+
+      return `${outerArc} L ${startInner.x} ${startInner.y} ${innerArc} Z`;
+    };
+
+    const createDonut = () => {
+      sections.forEach((section, index) => {
+        const start = index * 60;
+        const end = start + 60;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', buildRingPath(start, end, center.rOuter, center.rInner));
+        path.setAttribute('fill', colors[index % colors.length]);
+        path.setAttribute('tabindex', '0');
+        path.setAttribute('role', 'button');
+        path.setAttribute('aria-label', `${section.key} を開く`);
+        path.dataset.key = section.key;
+        path.dataset.index = index;
+        path.addEventListener('click', () => openPanel(section, path));
+        path.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openPanel(section, path);
+          }
+        });
+
+        const labelAngle = start + 30;
+        const labelRadius = (center.rOuter + center.rInner) / 2;
+        const pos = polarToCartesian(center.x, center.y, labelRadius, labelAngle);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', pos.x);
+        text.setAttribute('y', pos.y + 5);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', varColor('--text-main'));
+        text.setAttribute('font-size', '16');
+        text.setAttribute('font-weight', '700');
+        text.textContent = section.key;
+
+        svg.appendChild(path);
+        svg.appendChild(text);
+      });
+    };
+
+    const varColor = (name) => getComputedStyle(document.documentElement).getPropertyValue(name);
+
+    let activePath = null;
+
+    const openPanel = (section, pathEl) => {
+      panelTitle.textContent = section.title;
+      panelList.innerHTML = '';
+      section.bullets.forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        panelList.appendChild(li);
+      });
+      panelNote.textContent = section.note || '補足メモ: 必要に応じて差し替えてください。';
+
+      if (activePath && activePath !== pathEl) {
+        activePath.setAttribute('fill', colors[activePath.dataset.index]);
+      }
+      pathEl.setAttribute('fill', activeColor);
+      activePath = pathEl;
+
+      instruction.style.opacity = '0';
+      instruction.style.transform = 'scale(0.9)';
+
+      panel.setAttribute('aria-hidden', 'false');
+      panel.classList.add('active');
+      dim.classList.add('visible');
+      rightButtons.style.opacity = '0';
+      rightButtons.style.pointerEvents = 'none';
+    };
+
+    const closePanel = () => {
+      if (activePath) {
+        activePath.setAttribute('fill', colors[activePath.dataset.index]);
+      }
+      activePath = null;
+      panel.classList.remove('active');
+      panel.setAttribute('aria-hidden', 'true');
+      dim.classList.remove('visible');
+      instruction.style.opacity = '1';
+      instruction.style.transform = 'scale(1)';
+      rightButtons.style.opacity = '1';
+      rightButtons.style.pointerEvents = 'auto';
+    };
+
+    closeBtn.addEventListener('click', closePanel);
+    dim.addEventListener('click', closePanel);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePanel();
+      }
+    });
+
+    createDonut();
+  </script>
+</body>
+</html>
