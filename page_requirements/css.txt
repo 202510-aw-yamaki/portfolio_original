@@ -1,0 +1,32 @@
+【ファイル】common.css
+- 役割: 全ページ共通のベース定義。
+- 主な内容: 色変数（--warm-bg など）、box-sizing、html/bodyの初期化、共通フォント。
+- 参照ページ:
+  - yh_portfolio/profile.html
+  - yh_portfolio/portfolio.html
+  - yh_portfolio/skills.html
+  - yh_portfolio/contact.html
+
+【ファイル】profile.css
+- 役割: Profileページ固有の見た目・動作に関わるスタイル。
+- 主な内容: ドーナツメニュー、セクションパネル、右サイドボタン、Profile専用レイアウト。
+- 参照ページ:
+  - yh_portfolio/profile.html
+
+【ファイル】portfolio.css
+- 役割: Portfolioページ固有の見た目・動作に関わるスタイル。
+- 主な内容: 本の3状態（表紙/見開き/詳細）、ページめくり演出、作品カード、遷移オーバーレイ。
+- 参照ページ:
+  - yh_portfolio/portfolio.html
+
+【ファイル】skills.css
+- 役割: Skillsページ固有の見た目に関わるスタイル。
+- 主な内容: コルクボード、資格カード、ツールカード、凡例表示。
+- 参照ページ:
+  - yh_portfolio/skills.html
+
+【ファイル】contact.css
+- 役割: Contactページ固有の見た目・動作に関わるスタイル。
+- 主な内容: 郵便ポスト、付箋フォーム、投函アニメーション、送信完了カード。
+- 参照ページ:
+  - yh_portfolio/contact.html

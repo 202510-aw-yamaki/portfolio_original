@@ -1,0 +1,24 @@
+:root {
+  --warm-bg: linear-gradient(135deg, #fff6e9 0%, #ffe5cc 100%);
+  --deep-orange: #f07c2c;
+  --soft-orange: #ffb782;
+  --pale-orange: #ffe0c7;
+  --text-main: #5a3c2c;
+  --muted-text: #7a5a42;
+  --panel-bg: #fffaf4;
+  --shadow: 0 14px 38px rgba(120, 70, 30, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
