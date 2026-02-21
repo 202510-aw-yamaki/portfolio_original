@@ -233,7 +233,7 @@ body {
 .stage[aria-label="ポートフォリオリンク掲載ページ"] .main {
   /* mainエリア（指定：1365×650） */
   width: 1365px;
-  height: 650px;
+  height: min(650px, 100%);
   margin: 0 auto;
   padding: 0;
   position: relative;

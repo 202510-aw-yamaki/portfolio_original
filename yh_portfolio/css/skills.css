@@ -4,7 +4,7 @@ body {
 
 /* main は 650px（910 - header90 - bottom170 = 650） */
     .main{
-      height: 650px;
+      height: min(650px, 100%);
       padding: 12px 20px 8px;
       display: flex;
       justify-content: center;

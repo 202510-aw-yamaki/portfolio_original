@@ -7,7 +7,8 @@
   min-height: 0;
   height: auto;
   padding: 16px 14px 10px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .donut-area {
@@ -194,23 +195,6 @@
   border-radius: 0;
 }
 
-header {
-  padding: 12px 14px;
-}
-
-nav {
-  min-width: 0;
-  width: 100%;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 8px;
-}
-
-nav a {
-  padding: 8px 10px;
-  font-size: 13px;
-}
-
 .bottom-bar {
   height: auto;
   padding: 10px 0 12px;
@@ -227,15 +211,6 @@ nav a {
     max-width: 1024px;
     min-height: calc(100vh - 24px);
     border-radius: 20px;
-  }
-
-  header {
-    padding: 14px 20px;
-  }
-
-  nav {
-    justify-content: flex-end;
-    gap: 10px 12px;
   }
 
   .main {
@@ -268,47 +243,31 @@ nav a {
   }
 
   .stage {
-    width: 1440px;
-    height: 910px;
+    width: 100%;
+    height: 100%;
     border-radius: 28px;
     min-height: 0;
   }
 
-  header {
-    padding: 0 48px;
-  }
-
-  nav {
-    min-width: 520px;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 12px 16px;
-  }
-
-  nav a {
-    padding: 10px 14px;
-    font-size: 16px;
-  }
-
   .main {
-    height: 650px;
+    height: auto;
     grid-template-columns: 1fr;
     padding: 24px 32px 12px;
   }
 
   .donut-area {
-    min-height: 520px;
+    min-height: 0;
   }
 
   .donut svg {
-    width: 440px;
-    height: 440px;
+    width: min(100%, 420px, calc(100vh - 340px));
+    height: auto;
   }
 
   .instruction {
-    width: 220px;
-    height: 220px;
-    gap: 10px;
+    width: clamp(132px, 16vw, 190px);
+    height: clamp(132px, 16vw, 190px);
+    gap: 8px;
   }
 
   .content-panel {
@@ -319,8 +278,8 @@ nav a {
   }
 
   .bottom-bar {
-    height: 170px;
-    padding: 6px 0 0;
+    height: auto;
+    padding: 8px 0 10px;
   }
 
   .bottom-buttons {

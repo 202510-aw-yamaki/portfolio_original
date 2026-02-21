@@ -4,7 +4,7 @@
 
 .main {
       position: relative;
-      height: 650px;
+      height: min(650px, 100%);
       padding: 20px 32px 18px;
       display: flex;
       flex-direction: column;
