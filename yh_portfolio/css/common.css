@@ -60,6 +60,8 @@ nav {
   gap: 12px;
   width: 100%;
   justify-self: end;
+  align-items: center;
+  align-content: center;
 }
 
 .brand {
@@ -67,7 +69,6 @@ nav {
   font-size: inherit;
   letter-spacing: 0.8px;
   display: flex;
-  align-items: center;
   gap: 12px;
   white-space: nowrap;
   min-width: 0;
@@ -106,14 +107,16 @@ nav a {
   color: var(--text-main);
   font-weight: 600;
   margin-left: 0;
-  padding: 10px 10px;
+  padding: 8px 10px;
   border-radius: 12px;
   transition: background 0.3s ease, color 0.3s ease;
   white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  align-self: center;
+  height: auto;
+  min-height: 38px;
   text-align: center;
   font-size: clamp(10px, 0.95vw, 15px);
 }
