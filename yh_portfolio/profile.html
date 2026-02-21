@@ -232,6 +232,30 @@
       // Center helper circle tracks donut size and never exceeds it.
       const instructionSize = Math.min(Math.floor(side * 0.6), Math.max(72, Math.floor(side * 0.4)));
       donutArea.style.setProperty('--instruction-size', `${Math.min(instructionSize, side)}px`);
+      let titleSize = Math.max(8, Math.min(24, Math.floor(instructionSize * 0.16)));
+      let subSize = Math.max(6, Math.min(16, Math.floor(instructionSize * 0.11)));
+      let gapSize = Math.max(1, Math.min(8, Math.floor(instructionSize * 0.05)));
+      const applyInstructionTypography = () => {
+        donutArea.style.setProperty('--instruction-title-size', `${titleSize}px`);
+        donutArea.style.setProperty('--instruction-sub-size', `${subSize}px`);
+        donutArea.style.setProperty('--instruction-gap', `${gapSize}px`);
+      };
+
+      applyInstructionTypography();
+
+      // Guarantee text stays inside the center circle at small sizes.
+      let guard = 0;
+      while (
+        guard < 20 &&
+        (instruction.scrollHeight > instruction.clientHeight || instruction.scrollWidth > instruction.clientWidth)
+      ) {
+        titleSize = Math.max(7, titleSize - 1);
+        subSize = Math.max(5, subSize - 1);
+        gapSize = Math.max(0, gapSize - 1);
+        applyInstructionTypography();
+        guard += 1;
+        if (titleSize === 7 && subSize === 5 && gapSize === 0) break;
+      }
     };
 
     createDonut();
