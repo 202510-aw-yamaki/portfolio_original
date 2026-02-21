@@ -1,105 +1,4 @@
-:root {
-      --warm-bg: linear-gradient(135deg, #fff6e9 0%, #ffe5cc 100%);
-      --deep-orange: #f07c2c;
-      --soft-orange: #ffb782;
-      --pale-orange: #ffe0c7;
-      --text-main: #5a3c2c;
-      --muted-text: #7a5a42;
-      --panel-bg: #fffaf4;
-      --shadow: 0 14px 38px rgba(120, 70, 30, 0.14);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-      background: var(--warm-bg);
-      color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .stage {
-      width: 1440px;
-      height: 910px;
-      background: var(--warm-bg);
-      border-radius: 28px;
-      box-shadow: 0 18px 40px rgba(110, 60, 20, 0.16);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-    }
-
-    header {
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 48px;
-      border-bottom: 1px solid rgba(120, 70, 30, 0.12);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    nav {
-      display: flex;
-      gap: 12px 16px;
-      flex: 1 1 640px;
-      min-width: 520px;
-      justify-content: flex-end;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-      order: 2;
-    }
-
-    .brand {
-      font-weight: 700;
-      font-size: 22px;
-      letter-spacing: 0.8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      white-space: nowrap;
-    }
-
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ffcf9f, #f07c2c);
-      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.6);
-    }
-
-    nav a {
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 600;
-      margin-left: 0;
-      padding: 10px 14px;
-      border-radius: 12px;
-      transition: background 0.3s ease, color 0.3s ease;
-      white-space: nowrap;
-    }
-
-    nav a:hover,
-    nav a:focus-visible {
-      background: rgba(240, 124, 44, 0.12);
-      outline: none;
-      color: var(--deep-orange);
-    }
-
-    nav a[aria-current="page"]{
-      background: rgba(240, 124, 44, 0.16);
-      color: var(--deep-orange);
-    }
-
-    .main {
+.main {
       position: relative;
       height: 650px;
       display: grid;
@@ -232,63 +131,11 @@
     }
 
     .right-buttons,
-    .bottom-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .right-buttons {
+.right-buttons {
       width: 300px;
       transform: translateX(-200px);
     }
-
-    .bottom-buttons {
-      flex-direction: row;
-      justify-content: center;
-      padding: 0 32px;
-    }
-
-    .nav-button {
-      display: block;
-      width: 100%;
-      background: linear-gradient(135deg, #ffd3a6, #f28f42);
-      color: var(--text-main);
-      text-align: center;
-      padding: 18px 14px;
-      border-radius: 14px;
-      text-decoration: none;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    footer.bottom-bar .bottom-buttons .nav-button {
-      min-height: 84px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    footer.bottom-bar .nav-button{
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .nav-button:hover,
-    .nav-button:focus-visible {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
-      outline: none;
-    }
-
-    .nav-button:active {
-      transform: translateY(0);
-      box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
-    }
-
-    .main-background-dim {
+.main-background-dim {
       position: absolute;
       inset: 0;
       background: rgba(90, 52, 30, 0.1);
@@ -315,27 +162,7 @@
       justify-content: center;
       z-index: 2;
     }
-
-    .bottom-bar {
-      height: 170px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: 6px;
-      background: rgba(255, 214, 179, 0.45);
-      border-top: 1px solid rgba(120, 70, 30, 0.12);
-    }
-
-    .bottom-bar { position: relative; }
-
-    .nav-button--to-top{
-      position: absolute;
-      right: 40px;
-      bottom: 18px;
-      width: 220px;
-    }
-
-    .legend {
+.legend {
       position: absolute;
       bottom: 18px;
       left: 48px;

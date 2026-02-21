@@ -159,3 +159,30 @@ nav a[aria-current="page"] {
   display: none;
   pointer-events: none;
 }
+
+.nav-button {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, #ffd3a6, #f28f42);
+  color: var(--text-main);
+  text-align: center;
+  padding: 18px 14px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-button:hover,
+.nav-button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
+  outline: none;
+}
+
+.nav-button:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
+}
