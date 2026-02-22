@@ -149,16 +149,28 @@
 
     const featured = ['work-01', 'work-02', 'work-03'];
     const mobileQuery = window.matchMedia('(max-width: 767px)');
+    const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1199px)');
+    let spreadPageIndex = 0;
 
     function getFeaturedIds() {
       return mobileQuery.matches ? featured.slice(0, 2) : featured;
+    }
+
+    function getSpreadConfig() {
+      if (mobileQuery.matches) {
+        return { mode: 'mobile', perPage: 2, leftCount: 2, rightCount: 0 };
+      }
+      if (tabletQuery.matches) {
+        return { mode: 'tablet', perPage: 4, leftCount: 2, rightCount: 2 };
+      }
+      return { mode: 'pc', perPage: 6, leftCount: 3, rightCount: 3 };
     }
 
     function setState(next) {
       book.setAttribute('data-state', next);
     }
 
-    function turnAnimation(fn, kind = 'cover') {
+    function turnAnimation(fn, kind = 'cover', dir = 'next') {
       const coverDur = 1200;
       const innerDur = 1200;
       const isInner = kind === 'inner';
@@ -167,17 +179,22 @@
       const switchDelay = 560;
 
       book.classList.remove('is-turning', 'is-page-turning');
+      book.setAttribute('data-turn-dir', dir === 'prev' ? 'prev' : 'next');
       void book.offsetWidth;
       book.classList.add(cls);
 
       window.setTimeout(() => {
         fn();
-        window.setTimeout(() => book.classList.remove(cls), dur + 60);
+        window.setTimeout(() => {
+          book.classList.remove(cls);
+          book.removeAttribute('data-turn-dir');
+        }, dur + 60);
       }, switchDelay);
     }
 
     function renderCover() {
       setState('cover');
+      book.removeAttribute('data-spread-mode');
       toSpreadBtn.style.visibility = 'hidden';
       featuredList.innerHTML = '';
 
@@ -212,22 +229,36 @@
 
     function renderSpread() {
       setState('spread');
+      const config = getSpreadConfig();
+      book.setAttribute('data-spread-mode', config.mode);
       toSpreadBtn.style.visibility = 'hidden';
 
-      const list = works.slice(0, 6);
-      const leftItems = list.slice(0, 3);
-      const rightItems = list.slice(3, 6);
+      const totalPages = Math.max(1, Math.ceil(works.length / config.perPage));
+      spreadPageIndex = Math.min(spreadPageIndex, totalPages - 1);
+      const start = spreadPageIndex * config.perPage;
+      const list = works.slice(start, start + config.perPage);
+      const leftItems = list.slice(0, config.leftCount);
+      const rightItems = list.slice(config.leftCount, config.leftCount + config.rightCount);
+      const pager = spreadPaginationHtml(spreadPageIndex, totalPages);
 
-      leftTitle.textContent = '見開き一覧（最大6作品）';
-      rightTitle.textContent = '見開き一覧（最大6作品）';
+      leftTitle.textContent = '見開き一覧';
+      rightTitle.textContent = '見開き一覧';
 
-      spreadLeft.innerHTML = `<div class="spread-list" aria-label="左ページ作品一覧">${leftItems.map((w) => spreadItemHtml(w)).join('')}</div>`;
-      spreadRight.innerHTML = rightItems.length
-        ? `<div class="spread-list" aria-label="右ページ作品一覧">${rightItems.map((w) => spreadItemHtml(w)).join('')}</div>`
-        : `<div class="detail"><p>右ページに表示する作品はありません。</p></div>`;
+      spreadLeft.innerHTML = `
+        <div class="spread-list" aria-label="Left works list">${leftItems.map((w) => spreadItemHtml(w)).join('')}</div>
+        ${config.mode === 'mobile' ? pager : ''}
+      `;
+      spreadRight.innerHTML = config.mode === 'mobile'
+        ? ''
+        : `
+          <div class="spread-list" aria-label="Right works list">${rightItems.map((w) => spreadItemHtml(w)).join('')}</div>
+          ${pager}
+        `;
 
       bindSpreadItems(spreadLeft);
       bindSpreadItems(spreadRight);
+      bindSpreadPagination(spreadLeft);
+      bindSpreadPagination(spreadRight);
     }
 
     function spreadItemHtml(w) {
@@ -253,10 +284,37 @@
       });
     }
 
+    function spreadPaginationHtml(currentIndex, totalPages) {
+      if (totalPages <= 1) return '';
+      const page = currentIndex + 1;
+      return `
+        <nav class="spread-pagination" aria-label="Works pagination">
+          <button class="page-nav" type="button" data-page-action="prev" ${currentIndex === 0 ? 'disabled' : ''}>Prev</button>
+          <span class="page-indicator">${page} / ${totalPages}</span>
+          <button class="page-nav" type="button" data-page-action="next" ${currentIndex >= totalPages - 1 ? 'disabled' : ''}>Next</button>
+        </nav>
+      `;
+    }
+
+    function bindSpreadPagination(root) {
+      root.querySelectorAll('[data-page-action]').forEach((el) => {
+        el.addEventListener('click', () => {
+          const action = el.getAttribute('data-page-action');
+          const config = getSpreadConfig();
+          const totalPages = Math.max(1, Math.ceil(works.length / config.perPage));
+          const nextIndex = action === 'next' ? spreadPageIndex + 1 : spreadPageIndex - 1;
+          if (nextIndex < 0 || nextIndex >= totalPages) return;
+          spreadPageIndex = nextIndex;
+          turnAnimation(renderSpread, 'inner', action === 'next' ? 'next' : 'prev');
+        });
+      });
+    }
+
     function renderDetail(workId) {
       const w = works.find((x) => x.id === workId);
       if (!w) return;
       setState('detail');
+      book.removeAttribute('data-spread-mode');
       toSpreadBtn.style.visibility = 'visible';
 
       leftTitle.textContent = '作品情報とリンク';
@@ -298,10 +356,20 @@
 
     bookmarkBtn.addEventListener('click', () => {
       const st = book.getAttribute('data-state');
+      if (st === 'cover') spreadPageIndex = 0;
       turnAnimation(renderSpread, st === 'cover' ? 'cover' : 'inner');
     });
     toCoverBtn.addEventListener('click', () => turnAnimation(renderCover, 'cover'));
     toSpreadBtn.addEventListener('click', () => turnAnimation(renderSpread, 'inner'));
+
+    function rerenderByViewport() {
+      const state = book.getAttribute('data-state');
+      if (state === 'cover') renderCover();
+      if (state === 'spread') renderSpread();
+    }
+
+    mobileQuery.addEventListener('change', rerenderByViewport);
+    tabletQuery.addEventListener('change', rerenderByViewport);
 
     renderCover();
   </script>
