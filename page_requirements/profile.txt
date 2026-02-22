@@ -1,43 +1,60 @@
-﻿【対象ファイル】
-yh_portfolio_profile.html
+【対象ファイル】
+yh_portfolio/profile.html
 
 【ページの目的】
-- ドーナツ型メニューをクリックして、プロフィール情報を展開表示する。
-- クリックして中身が開く体験をページの中心に置く。
+- ドーナツ型の6セクションを入口に、プロフィール情報を段階表示する。
+- 1画面内で「選択 -> 詳細確認 -> 閉じる」を完結させる。
 
-【レイアウト仕様】
-- 固定ステージ構成: 1440x910。
-- 上部: 共通ヘッダー（ブランド + 4ページナビ）。
-- 中央: 左にドーナツメニュー、右に遷移ボタン領域。
-- 下部: 共通の大きめナビボタンを持つフッター。
-- メイン領域は 3カラム（ドーナツ / 中央領域 / 右ボタン）。
+【HTML構造】
+- `.stage` 配下は `header / .main / footer.bottom-bar` の3層。
+- `header`:
+  - `.brand`（ロゴ + テキスト）
+  - `nav`（4ページリンク、現在ページは `aria-current="page"`）
+- `.main`:
+  - `.donut-area`
+    - `#instruction`（初期ガイド）
+    - `svg.donut`（JSでセグメント動的生成）
+  - `#dim.main-background-dim`（背景ディム）
+  - `#panel.content-panel`（詳細パネル: `#panelTitle / #panelList / #panelNote / #closeBtn`）
+  - `.center-placeholder`（レイアウト補助）
+- `footer.bottom-bar`:
+  - `.bottom-buttons` 内に4リンク。
+  - 現在ページは `.is-current` + `tabindex="-1"`。
 
-【デザイン仕様】
-- 暖色系の統一テーマ（背景グラデーション、オレンジ系アクセント）。
-- ドーナツリングは6セクションで色分け。
-- パネル展開時に背景ディム（半透明オーバーレイ）を表示。
+【JS仕様（inline script）】
+- データ:
+  - `sections` 配列（6項目）。各項目は `key / title / bullets / note?` を持つ。
+  - `colors` と `activeColor` でセグメント色管理。
+- SVG生成:
+  - `polarToCartesian` / `describeArc` / `buildRingPath` でリングパス算出。
+  - `createDonut()` が `path` とラベル `text` を各セクション分生成。
+  - 各 `path` は `click` と `keydown(Enter/Space)` で `openPanel()` 実行。
+- パネル表示:
+  - `openPanel(section, pathEl)` でタイトル・箇条書き・注記を差し替え。
+  - 選択セグメントのみ `activeColor`、それ以外は元色へ戻す。
+  - `#instruction` を縮退、`#panel` を `.active`、`#dim` を `.visible`。
+- パネル閉じる:
+  - `#closeBtn` クリック / `#dim` クリック / `Escape` で `closePanel()`。
+  - 配色・表示状態を初期へ復帰。
+- 可変サイズ制御:
+  - `fitDonutToMain()` で `.donut-area` 実寸に合わせ `--donut-size` を更新。
+  - 中央ガイド円は `--instruction-size` と文字サイズ変数を連動調整。
+  - テキスト溢れ時は段階的に縮小（最大20回ループでガード）。
+  - `ResizeObserver` + `resize/orientationchange` で再計算。
 
-【インタラクション仕様】
-- 初期状態: 中央に操作案内（instruction）を表示。
-- ドーナツの各セクションは click / Enter / Space で開ける。
-- セクション選択で以下を実行:
-  - タイトル・箇条書き・補足文をパネルに描画。
-  - 選択セクションをアクティブ色へ変更。
-  - 案内表示をフェードアウト。
-  - コンテンツパネルを拡大表示。
-  - 右側ボタンを一時的に非表示化。
-- 閉じる操作:
-  - 「閉じる」ボタン
-  - ディム背景クリック
-  - Escキー
-- 閉じると初期表示状態へ戻る（配色・案内・右ボタン復帰）。
+【レスポンシブ/見た目】
+- 共通配色変数は `css/common.css` を利用。
+- ページ固有レイアウトは `css/profile.css`:
+  - mobile: 全幅ステージ、中央ドーナツ主体。
+  - tablet/pc: パディング・パネルサイズ・凡例位置を拡張。
 
-【アクセシビリティ仕様】
-- ドーナツの各要素は role="button" と tabindex を持つ。
-- パネルは aria-live / aria-hidden を利用。
+【アクセシビリティ】
+- セグメントは `role="button"` + `tabindex="0"`。
+- パネルは `aria-live="polite"` と `aria-hidden` 切り替え。
+- reduced motion は `common.css` の全体設定で短縮。
 
-【遷移仕様】
-- ヘッダーとフッターに以下リンクを配置:
+【ページ間遷移】
+- ヘッダー/フッターから以下へ相互遷移:
   - yh_portfolio/profile.html
   - yh_portfolio/portfolio.html
   - yh_portfolio/skills.html

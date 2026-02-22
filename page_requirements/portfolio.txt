@@ -1,64 +1,79 @@
-﻿【対象ファイル】
+【対象ファイル】
 yh_portfolio/portfolio.html
 
 【ページの目的】
-- 「本をめくる」体験で作品一覧・詳細を切り替える。
-- 表紙 → 見開き一覧 → 詳細の3状態を持つインタラクティブページ。
+- 本をめくるUIで作品を閲覧する（表紙 -> 見開き一覧 -> 詳細）。
+- 1つのデータ配列 `works` を表紙・一覧・詳細で共通利用する。
 
-【レイアウト仕様】
-- 固定ステージ構成: 1440x910。
-- 上部: 共通ヘッダー（ブランド + 4ページナビ）。
-- 中央: 本オブジェクト（book）と右側遷移ボタン。
-- 下部: 共通フッターナビ。
+【HTML構造】
+- `.stage` 配下は `header / .main / footer`。
+- `.main`:
+  - `.book-area`
+    - `#book.book`（`data-state="cover|spread|detail"`）
+    - `#bookmarkBtn.bookmark`（一覧へ）
+    - `#cover.cover`（表紙）
+      - `#featuredList`（注目作品をJSで描画）
+    - `.pages`（見開き）
+      - 左 `.page`: `#leftTitle`, `#toCoverBtn`, `#spreadLeft`
+      - 右 `.page`: `#rightTitle`, `#toSpreadBtn`, `#spreadRight`
+      - `#bookPagination`（ページャ）
+  - `.center-placeholder`
 
 【状態仕様（book[data-state]）】
-- cover:
-  - 表紙状態。
-  - 注目3作品（featured）を表示。
-  - 一覧へ戻るボタン（toSpreadBtn）は非表示。
-- spread:
-  - 見開き一覧状態（最大6作品、左右ページに分割）。
-  - 各作品カードを選択すると詳細へ遷移。
-- detail:
-  - 1作品の詳細表示状態。
-  - 左ページ: タイトル、タグ、短文、リンク群。
-  - 右ページ: 詳細説明。
-  - 一覧へ戻るボタンを表示。
+- `cover`:
+  - 表紙表示。`featured` 作品のみ表示。
+  - `toSpreadBtn` は非表示。
+- `spread`:
+  - 見開き一覧（左/右に分割表示）。
+  - 作品クリックで詳細へ。
+- `detail`:
+  - 左: タイトル/タグ/短文/リンク。
+  - 右: 詳細本文。
+  - 前後作品へ移動する詳細ページャを表示。
 
-【データ仕様】
-- works 配列で作品情報を管理。
-- 作品情報の主な項目:
-  - id
-  - title
-  - short
-  - detail
-  - tags
-  - pageUrl（未設定時はプレースホルダ表示）
-  - downloadUrl（未設定時はプレースホルダ表示）
-- featured 配列で表紙の注目3作品を指定。
+【JS仕様（inline script）】
+- データ:
+  - `works[]`: `id/title/short/tags/detail/pageUrl/downloadUrl`。
+  - `featured[]`: 表紙表示対象ID。
+- レスポンシブ分岐:
+  - `mobileQuery(max-width:767)`
+  - `tabletQuery(768-1023)`
+  - `getSpreadConfig()` が `perPage/leftCount/rightCount` を返す。
+- 描画関数:
+  - `renderCover()`
+  - `renderSpread()`
+  - `renderDetail(workId)`
+  - `renderDetailByIndex(index)`
+- 遷移アニメーション:
+  - `turnAnimation(fn, kind, dir)` が `is-turning / is-page-turning` を付与。
+  - cover遷移と内側ページ遷移で継続時間・クラスを分離。
+- 一覧ページャ:
+  - `spreadPaginationHtml()` + `bindSpreadPagination()`。
+- 詳細ページャ:
+  - `detailPaginationHtml()` + `bindDetailPagination()`。
+- 文字列安全化:
+  - `escapeHtml()` を通して `innerHTML` へ挿入。
 
-【インタラクション仕様】
-- bookmark ボタンで一覧状態へ遷移。
-- 表紙へ戻る（toCoverBtn）で cover へ戻る。
-- 一覧へ戻る（toSpreadBtn）で spread へ戻る。
-- 作品項目は click / Enter / Space で詳細表示可能。
-- turnAnimation() で表紙めくりと内側ページめくりを使い分け。
+【モバイル操作】
+- `.pages` 上で横スワイプを検出し、一覧/詳細の前後遷移。
+- カバー状態専用の touch 制御あり。
+- 画面端のブラウザ戻る/進むジェスチャを抑制する edge guard 実装あり。
 
-【ページ遷移演出仕様】
-- ページ内の本操作に対してのみ、めくり演出を適用する。
-  - cover → spread
-  - spread → detail
-  - detail → spread
-  - spread → cover
-- ヘッダー/フッターのページリンク遷移では、めくり演出を適用しない（通常遷移）。
-- prefers-reduced-motion 条件時は演出を抑制する。
+【アクセシビリティ】
+- 作品項目は `role="button"` + `tabindex="0"`。
+- ボタン群へ `aria-label`、ページャは `aria-live` を利用。
+- `prefers-reduced-motion` 時はCSS側でアニメーション抑制。
 
-【アクセシビリティ仕様】
-- 作品項目は role="button" / tabindex でキーボード操作可能。
-- ボタン類に aria-label を付与。
+【CSS連携】
+- 共通: `css/common.css`
+- ページ固有: `css/portfolio.css`
+  - book外観
+  - cover/pages/detailの状態別スタイル
+  - page turnアニメーション
+  - mobile/tablet/pcの細かな寸法調整
 
-【遷移仕様】
-- ヘッダーとフッターに以下リンクを配置:
+【ページ間遷移】
+- ヘッダー/フッターから以下へ相互遷移:
   - yh_portfolio/profile.html
   - yh_portfolio/portfolio.html
   - yh_portfolio/skills.html

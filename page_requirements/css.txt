@@ -1,32 +1,92 @@
-【ファイル】common.css
-- 役割: 全ページ共通のベース定義。
-- 主な内容: 色変数（--warm-bg など）、box-sizing、html/bodyの初期化、共通フォント。
-- 参照ページ:
-  - yh_portfolio/profile.html
-  - yh_portfolio/portfolio.html
-  - yh_portfolio/skills.html
-  - yh_portfolio/contact.html
+【対象ファイル】
+yh_portfolio/css/common.css
 
-【ファイル】profile.css
-- 役割: Profileページ固有の見た目・動作に関わるスタイル。
-- 主な内容: ドーナツメニュー、セクションパネル、右サイドボタン、Profile専用レイアウト。
-- 参照ページ:
-  - yh_portfolio/profile.html
+【役割】
+- 全ページ共通のデザイントークン・レイアウト骨格・共通UI部品を定義する。
 
-【ファイル】portfolio.css
-- 役割: Portfolioページ固有の見た目・動作に関わるスタイル。
-- 主な内容: 本の3状態（表紙/見開き/詳細）、ページめくり演出、作品カード、遷移オーバーレイ。
-- 参照ページ:
-  - yh_portfolio/portfolio.html
+【主仕様】
+- `:root` に暖色テーマ変数を定義（背景、テキスト、ボタン、影）。
+- `body` と `.stage` でアプリ全体の表示枠を構築。
+- `header/nav/brand` の共通レイアウト。
+- `footer.bottom-bar` と `.footer-card` の共通見た目。
+- 共通ボタン系（`.nav-button`, `.page-nav`）とタグ（`.chips/.chip`）。
+- `.main-background-dim`（モーダル背景ディム）。
+- `prefers-reduced-motion` でアニメーション短縮。
+- ブレークポイント方針:
+  - mobile: <= 767px
+  - tablet: 768 - 1023px
+  - desktop: >= 1024px
 
-【ファイル】skills.css
-- 役割: Skillsページ固有の見た目に関わるスタイル。
-- 主な内容: コルクボード、資格カード、ツールカード、凡例表示。
-- 参照ページ:
-  - yh_portfolio/skills.html
+【対象ページ】
+- yh_portfolio/profile.html
+- yh_portfolio/portfolio.html
+- yh_portfolio/skills.html
+- yh_portfolio/contact.html
 
-【ファイル】contact.css
-- 役割: Contactページ固有の見た目・動作に関わるスタイル。
-- 主な内容: 郵便ポスト、付箋フォーム、投函アニメーション、送信完了カード。
-- 参照ページ:
-  - yh_portfolio/contact.html
+
+【対象ファイル】
+yh_portfolio/css/profile.css
+
+【役割】
+- Profileページ専用のドーナツUIと詳細パネル表示を定義する。
+
+【主仕様】
+- `.main` と `.donut-area` の中央配置。
+- `.donut` サイズは CSS変数（`--donut-size`）でJSと連携。
+- `.instruction` の中央円表示（サイズ・文字も変数連動）。
+- `.content-panel` のモーダル表示/非表示（`.active`）。
+- セグメント hover/focus 表現。
+- tablet/pc でパディング・パネル寸法を拡張。
+
+【対象ページ】
+- yh_portfolio/profile.html
+
+
+【対象ファイル】
+yh_portfolio/css/portfolio.css
+
+【役割】
+- Portfolioページ専用の本UI・状態遷移・ページめくり演出を定義する。
+
+【主仕様】
+- `.book` の状態別寸法 (`data-state="cover|spread|detail"`)。
+- `.cover`（表紙）と `.pages`（見開き）の切替スタイル。
+- `.bookmark`、見開きの左右 `.page`、一覧カード `.spread-item`、詳細 `.detail` を定義。
+- `is-turning/is-page-turning` の keyframes によるめくり演出。
+- モバイル時は1カラム見開き + スワイプ前提のタッチ最適化。
+
+【対象ページ】
+- yh_portfolio/portfolio.html
+
+
+【対象ファイル】
+yh_portfolio/css/skills.css
+
+【役割】
+- Skillsページ専用のコルクボード/カードUIを定義する。
+
+【主仕様】
+- コルク質感背景（複合グラデーション）。
+- 凡例（`.legend`）とカテゴリ枠（`.area.cert/.area.tool`）。
+- カード（`.paper`）の回転、画鋲表現、文字階層。
+- 端末幅に応じたカードグリッド列数変更（mobile/tablet/pc）。
+
+【対象ページ】
+- yh_portfolio/skills.html
+
+
+【対象ファイル】
+yh_portfolio/css/contact.css
+
+【役割】
+- Contactページ専用のポスト演出・付箋フォーム・送信結果表示を定義する。
+
+【主仕様】
+- `.post` 系で郵便ポスト装飾。
+- `.sticky-note` でフォーム面を構築。
+- `.sticky-wrapper.is-animating` で投函アニメーション（`foldAndFly/cornerFold`）。
+- `.success-card` の表示切替（`.is-visible`）。
+- tablet/pc は左右2カラム、mobile は重ね表示。
+
+【対象ページ】
+- yh_portfolio/contact.html
