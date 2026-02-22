@@ -1,8 +1,9 @@
-.stage {
+﻿.stage {
   isolation: isolate;
 }
 
-.main {
+.main,
+.contact-page__main {
   position: relative;
   height: 100%;
   min-height: 0;

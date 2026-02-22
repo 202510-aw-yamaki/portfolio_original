@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -8,15 +8,15 @@
   <link rel="stylesheet" href="css/contact.css" />
 </head>
 <body>
-  <div class="stage" aria-label="お問い合わせページ">
-    <header>
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
+  <article class="stage site site--contact" aria-label="お問い合わせページ">
+    <header class="site__header">
+      <div class="brand site__brand">
+        <div class="brand-mark site__brand-mark" aria-hidden="true">
           <img src="image/HYlogo.png" alt="" />
         </div>
-        <div class="brand-text"><span>Horse</span><span>Yobibit+5</span><span>Studio</span></div>
+        <div class="brand-text site__brand-text"><span>Horse</span><span>Yobibit+5</span><span>Studio</span></div>
       </div>
-      <nav aria-label="ページ遷移">
+      <nav class="site__nav" aria-label="ページ遷移">
         <a href="profile.html">プロフィール</a>
         <a href="portfolio.html">ポートフォリオ</a>
         <a href="skills.html">スキル</a>
@@ -24,16 +24,16 @@
       </nav>
     </header>
 
-    <div class="main" role="main">
-      <div class="title-band" aria-label="タイトル帯">
+    <main class="main contact-page__main" role="main">
+      <header class="title-band" aria-label="タイトル帯">
         <div class="title-main">
           <h1>お問い合わせ</h1>
           <span>CONTACT</span>
         </div>
-      </div>
+      </header>
 
-      <div class="scene">
-        <div class="post-area" aria-hidden="true">
+      <section class="scene">
+        <aside class="post-area" aria-hidden="true">
           <div class="post-shadow"></div>
           <div class="post">
             <div class="post-slot"></div>
@@ -41,9 +41,9 @@
             <div class="post-logo">郵便<span>POST</span></div>
             <div class="post-leg"></div>
           </div>
-        </div>
+        </aside>
 
-        <div class="sticky-area">
+        <section class="sticky-area">
           <div class="sticky-wrapper" id="stickyWrapper">
             <form class="sticky-note" id="contactForm" aria-label="お問い合わせフォーム" novalidate>
               <h2>お気軽にご連絡ください</h2>
@@ -93,19 +93,19 @@
               <button type="button" class="success-reset-btn" id="resultResetButton">フォームに戻る</button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </section>
+      </section>
+    </main>
 
-    <footer class="bottom-bar" aria-label="ボトムバー">
-      <div class="bottom-buttons">
-        <a class="footer-card" href="profile.html" aria-hidden="false" tabindex="0">プロフィール (Profile)</a>
-        <a class="footer-card" href="portfolio.html" aria-hidden="false" tabindex="0">ポートフォリオ (Portfolio)</a>
-        <a class="footer-card" href="skills.html" aria-hidden="false" tabindex="0">スキル (Skills)</a>
-        <a class="footer-card is-current" href="contact.html" aria-hidden="true" tabindex="-1">お問い合わせ (Contact)</a>
-      </div>
+    <footer class="bottom-bar site__footer" aria-label="ボトムバー">
+      <nav class="bottom-buttons site__footer-nav" aria-label="Footer Navigation">
+        <a class="footer-card site__footer-card" href="profile.html" aria-hidden="false" tabindex="0">プロフィール (Profile)</a>
+        <a class="footer-card site__footer-card" href="portfolio.html" aria-hidden="false" tabindex="0">ポートフォリオ (Portfolio)</a>
+        <a class="footer-card site__footer-card" href="skills.html" aria-hidden="false" tabindex="0">スキル (Skills)</a>
+        <a class="footer-card site__footer-card is-current" href="contact.html" aria-hidden="true" tabindex="-1">お問い合わせ (Contact)</a>
+      </nav>
     </footer>
-  </div>
+  </article>
 
   <script>
     const form = document.getElementById('contactForm');

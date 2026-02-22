@@ -8,15 +8,15 @@
   <link rel="stylesheet" href="css/portfolio.css" />
 </head>
 <body>
-  <div class="stage" aria-label="ポートフォリオページ">
-    <header>
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
+  <article class="stage site site--portfolio" aria-label="ポートフォリオページ">
+    <header class="site__header">
+      <div class="brand site__brand">
+        <div class="brand-mark site__brand-mark" aria-hidden="true">
           <img src="image/HYlogo.png" alt="" />
         </div>
-        <div class="brand-text"><span>Horse</span><span>Yobibit+5</span><span>Studio</span></div>
+        <div class="brand-text site__brand-text"><span>Horse</span><span>Yobibit+5</span><span>Studio</span></div>
       </div>
-      <nav aria-label="ページ遷移">
+      <nav class="site__nav" aria-label="ページ遷移">
         <a href="profile.html">プロフィール</a>
         <a href="portfolio.html" aria-current="page">ポートフォリオ</a>
         <a href="skills.html">スキル</a>
@@ -24,7 +24,7 @@
       </nav>
     </header>
 
-    <div class="main" role="main">
+    <main class="main portfolio-page__main" role="main">
       <section class="book-area" aria-label="ポートフォリオ本">
         <div class="book" id="book" data-state="cover">
           <button class="bookmark" id="bookmarkBtn" type="button" aria-label="一覧を開く">一覧へ</button>
@@ -66,18 +66,18 @@
           </div>
         </div>
       </section>
-      <div class="center-placeholder" aria-hidden="true"></div>
-    </div>
+      <aside class="center-placeholder" aria-hidden="true"></aside>
+    </main>
 
-    <footer class="bottom-bar" aria-label="ボトムバー">
-      <div class="bottom-buttons">
-        <a class="footer-card" href="profile.html" aria-hidden="false" tabindex="0">プロフィール (Profile)</a>
-        <a class="footer-card is-current" href="portfolio.html" aria-hidden="true" tabindex="-1">ポートフォリオ (Portfolio)</a>
-        <a class="footer-card" href="skills.html" aria-hidden="false" tabindex="0">スキル (Skills)</a>
-        <a class="footer-card" href="contact.html" aria-hidden="false" tabindex="0">お問い合わせ (Contact)</a>
-      </div>
+    <footer class="bottom-bar site__footer" aria-label="ボトムバー">
+      <nav class="bottom-buttons site__footer-nav" aria-label="Footer Navigation">
+        <a class="footer-card site__footer-card" href="profile.html" aria-hidden="false" tabindex="0">プロフィール (Profile)</a>
+        <a class="footer-card site__footer-card is-current" href="portfolio.html" aria-hidden="true" tabindex="-1">ポートフォリオ (Portfolio)</a>
+        <a class="footer-card site__footer-card" href="skills.html" aria-hidden="false" tabindex="0">スキル (Skills)</a>
+        <a class="footer-card site__footer-card" href="contact.html" aria-hidden="false" tabindex="0">お問い合わせ (Contact)</a>
+      </nav>
     </footer>
-  </div>
+  </article>
 
   <script>
     const book = document.getElementById('book');

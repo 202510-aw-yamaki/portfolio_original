@@ -1,5 +1,6 @@
-/* ヘッダーでリンクが2行化しないよう、ナビ全体を必要時に2段目へ移す */
-.main {
+﻿/* ヘッダーでリンクが2行化しないよう、ナビ全体を必要時に2段目へ移す */
+.main,
+.portfolio-page__main {
       position: relative;
       flex: 1;
       height: 100%;
