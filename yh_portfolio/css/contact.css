@@ -683,12 +683,6 @@ input:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
-    scroll-behavior: auto !important;
-    animation-duration: 0ms !important;
-    transition-duration: 0ms !important;
-  }
-
   .sticky-wrapper.is-animating .sticky-note {
     animation: none;
   }
