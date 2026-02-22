@@ -1167,6 +1167,13 @@ body {
         gap: 10px;
       }
 
+      .book[data-state="spread"] .page,
+      .book[data-state="detail"] .page {
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-gutter: stable;
+      }
+
       .page-header {
         gap: 8px;
         padding-bottom: 8px;
@@ -1216,6 +1223,12 @@ body {
 
       .detail {
         gap: 10px;
+      }
+
+      .book[data-state="spread"] .detail,
+      .book[data-state="detail"] .detail {
+        overflow: visible;
+        padding-right: 0;
       }
 
       .detail h3 {
