@@ -89,6 +89,8 @@
     const bookmarkBtn = document.getElementById('bookmarkBtn');
     const toCoverBtn = document.getElementById('toCoverBtn');
     const toSpreadBtn = document.getElementById('toSpreadBtn');
+    const leftHeader = spreadLeft.parentElement.querySelector('.page-header');
+    const rightHeader = spreadRight.parentElement.querySelector('.page-header');
 
     const works = [
       {
@@ -166,6 +168,20 @@
       return { mode: 'pc', perPage: 6, leftCount: 3, rightCount: 3 };
     }
 
+    function placeHeaderButtons(mode) {
+      if (mode === 'detail') {
+        if (toSpreadBtn.parentElement !== leftHeader) leftHeader.appendChild(toSpreadBtn);
+        if (toCoverBtn.parentElement !== rightHeader) rightHeader.appendChild(toCoverBtn);
+        toSpreadBtn.style.visibility = 'visible';
+        toCoverBtn.style.visibility = 'visible';
+        return;
+      }
+      if (toCoverBtn.parentElement !== leftHeader) leftHeader.appendChild(toCoverBtn);
+      if (toSpreadBtn.parentElement !== rightHeader) rightHeader.appendChild(toSpreadBtn);
+      toCoverBtn.style.visibility = 'visible';
+      toSpreadBtn.style.visibility = 'hidden';
+    }
+
     function setState(next) {
       book.setAttribute('data-state', next);
     }
@@ -195,6 +211,7 @@
     function renderCover() {
       setState('cover');
       book.removeAttribute('data-spread-mode');
+      placeHeaderButtons('default');
       toSpreadBtn.style.visibility = 'hidden';
       featuredList.innerHTML = '';
 
@@ -231,6 +248,7 @@
       setState('spread');
       const config = getSpreadConfig();
       book.setAttribute('data-spread-mode', config.mode);
+      placeHeaderButtons('default');
       toSpreadBtn.style.visibility = 'hidden';
 
       const totalPages = Math.max(1, Math.ceil(works.length / config.perPage));
@@ -315,6 +333,7 @@
       if (!w) return;
       setState('detail');
       book.removeAttribute('data-spread-mode');
+      placeHeaderButtons('detail');
       toSpreadBtn.style.visibility = 'visible';
 
       leftTitle.textContent = '作品情報とリンク';

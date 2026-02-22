@@ -331,6 +331,12 @@ body {
       transform: none;
       z-index: 40;
     }
+
+    .book[data-state="spread"] .bookmark,
+    .book[data-state="detail"] .bookmark {
+      opacity: 0;
+      pointer-events: none;
+    }
     .bookmark:focus-visible {
       outline: 3px solid rgba(255,255,255,0.72);
       outline-offset: 3px;
@@ -677,12 +683,12 @@ body {
     }
 
     .book[data-state="detail"] .detail h3 {
-      font-size: 18px;
+      font-size: clamp(15px, 1.2vw, 18px);
     }
 
     .book[data-state="detail"] .detail p {
-      font-size: 14px;
-      line-height: 1.8;
+      font-size: clamp(12px, 0.95vw, 14px);
+      line-height: 1.75;
     }
 
     .works-grid {
@@ -748,7 +754,9 @@ body {
     }
 
     .detail {
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
       padding-right: 6px;
       display: flex;
       flex-direction: column;
