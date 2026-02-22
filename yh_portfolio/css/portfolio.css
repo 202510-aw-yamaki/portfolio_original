@@ -499,6 +499,7 @@ body {
   /* 見開き時：630 + 40（綴じ） + 630 = 1300 を意識 */
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 40px;
 
   /* 余計な外側余白を消して「pages が book の中に納まる」を優先 */
@@ -520,6 +521,19 @@ body {
 
   overflow: hidden;
 }
+
+    .book-pagination {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      min-height: 0;
+      padding: 6px 12px 10px;
+      border-top: 1px solid rgba(120, 70, 30, 0.12);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .book-pagination .spread-pagination {
+      margin-top: 0;
+    }
 
     .pages::after {
       content: "";
@@ -674,6 +688,15 @@ body {
       font-size: clamp(11px, 0.78vw, 13px);
       font-weight: 700;
       color: rgba(65, 30, 12, 0.8);
+    }
+
+    .detail-pagination .page-indicator {
+      flex: 1;
+      min-width: 0;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* 本が開いている時は、本文を少し大きめに（左右ページに説明を書きやすくする） */
@@ -1131,10 +1154,11 @@ body {
 
       .pages {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto;
         gap: 10px;
         padding: 10px;
         border-radius: 16px;
+        touch-action: pan-y;
       }
 
       .spine {
@@ -1142,7 +1166,7 @@ body {
       }
 
       .book[data-state="detail"] .pages {
-        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto;
       }
 
       .book[data-state="spread"][data-spread-mode="mobile"] #rightPage {
@@ -1159,6 +1183,10 @@ body {
         transform: none;
         width: 14px;
         border-radius: 10px 0 0 10px;
+      }
+
+      .book-pagination {
+        padding: 6px 4px 2px;
       }
 
       .page {

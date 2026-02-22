@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -61,6 +61,8 @@
               </div>
               <div id="spreadRight"></div>
             </div>
+
+            <div class="book-pagination" id="bookPagination" aria-live="polite"></div>
           </div>
         </div>
       </section>
@@ -82,6 +84,8 @@
     const featuredList = document.getElementById('featuredList');
     const spreadLeft = document.getElementById('spreadLeft');
     const spreadRight = document.getElementById('spreadRight');
+    const pagesEl = document.querySelector('.pages');
+    const bookPagination = document.getElementById('bookPagination');
     const leftTitle = document.getElementById('leftTitle');
     const rightTitle = document.getElementById('rightTitle');
     const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -153,6 +157,7 @@
     const mobileQuery = window.matchMedia('(max-width: 767px)');
     const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1199px)');
     let spreadPageIndex = 0;
+    let currentDetailIndex = -1;
 
     function getFeaturedIds() {
       return mobileQuery.matches ? featured.slice(0, 2) : featured;
@@ -213,6 +218,7 @@
       book.removeAttribute('data-spread-mode');
       placeHeaderButtons('default');
       toSpreadBtn.style.visibility = 'hidden';
+      bookPagination.innerHTML = '';
       featuredList.innerHTML = '';
 
       getFeaturedIds().forEach((id) => {
@@ -264,19 +270,17 @@
 
       spreadLeft.innerHTML = `
         <div class="spread-list" aria-label="Left works list">${leftItems.map((w) => spreadItemHtml(w)).join('')}</div>
-        ${config.mode === 'mobile' ? pager : ''}
       `;
       spreadRight.innerHTML = config.mode === 'mobile'
         ? ''
         : `
           <div class="spread-list" aria-label="Right works list">${rightItems.map((w) => spreadItemHtml(w)).join('')}</div>
-          ${pager}
         `;
+      bookPagination.innerHTML = pager;
 
       bindSpreadItems(spreadLeft);
       bindSpreadItems(spreadRight);
-      bindSpreadPagination(spreadLeft);
-      bindSpreadPagination(spreadRight);
+      bindSpreadPagination(bookPagination);
     }
 
     function spreadItemHtml(w) {
@@ -328,9 +332,40 @@
       });
     }
 
+    function detailPaginationHtml(index) {
+      if (index < 0 || index >= works.length) return '';
+      const prevDisabled = index === 0 ? 'disabled' : '';
+      const nextDisabled = index === works.length - 1 ? 'disabled' : '';
+      return `
+        <nav class="spread-pagination detail-pagination" aria-label="作品詳細ページ移動">
+          <button class="page-nav" type="button" data-detail-action="prev" ${prevDisabled}>前へ</button>
+          <span class="page-indicator">${escapeHtml(works[index].title)}</span>
+          <button class="page-nav" type="button" data-detail-action="next" ${nextDisabled}>次へ</button>
+        </nav>
+      `;
+    }
+
+    function bindDetailPagination() {
+      document.querySelectorAll('[data-detail-action]').forEach((el) => {
+        el.addEventListener('click', () => {
+          const action = el.getAttribute('data-detail-action');
+          const nextIndex = action === 'next' ? currentDetailIndex + 1 : currentDetailIndex - 1;
+          if (nextIndex < 0 || nextIndex >= works.length) return;
+          currentDetailIndex = nextIndex;
+          turnAnimation(() => renderDetailByIndex(nextIndex), 'inner', action === 'next' ? 'next' : 'prev');
+        });
+      });
+    }
+
+    function renderDetailByIndex(index) {
+      if (index < 0 || index >= works.length) return;
+      renderDetail(works[index].id);
+    }
+
     function renderDetail(workId) {
       const w = works.find((x) => x.id === workId);
       if (!w) return;
+      currentDetailIndex = works.findIndex((x) => x.id === workId);
       setState('detail');
       book.removeAttribute('data-spread-mode');
       placeHeaderButtons('detail');
@@ -362,6 +397,8 @@
           <p>${escapeHtml(w.detail)}</p>
         </div>
       `;
+      bookPagination.innerHTML = detailPaginationHtml(currentDetailIndex);
+      bindDetailPagination();
     }
 
     function escapeHtml(str) {
@@ -386,6 +423,91 @@
       if (state === 'cover') renderCover();
       if (state === 'spread') renderSpread();
     }
+
+    function canSwipeNow() {
+      return mobileQuery.matches && !book.classList.contains('is-turning') && !book.classList.contains('is-page-turning');
+    }
+
+    function handleMobileSwipe(direction) {
+      if (!canSwipeNow()) return;
+      const state = book.getAttribute('data-state');
+
+      if (state === 'detail') {
+        const nextIndex = direction === 'next' ? currentDetailIndex + 1 : currentDetailIndex - 1;
+        if (nextIndex < 0 || nextIndex >= works.length) return;
+        currentDetailIndex = nextIndex;
+        turnAnimation(() => renderDetailByIndex(nextIndex), 'inner', direction);
+        return;
+      }
+
+      if (state === 'spread') {
+        const config = getSpreadConfig();
+        const totalPages = Math.max(1, Math.ceil(works.length / config.perPage));
+        const nextIndex = direction === 'next' ? spreadPageIndex + 1 : spreadPageIndex - 1;
+        if (nextIndex < 0 || nextIndex >= totalPages) return;
+        spreadPageIndex = nextIndex;
+        turnAnimation(renderSpread, 'inner', direction);
+      }
+    }
+
+    let touchTracking = false;
+    let touchLockHorizontal = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchCurrentX = 0;
+
+    function resetTouchSwipe() {
+      touchTracking = false;
+      touchLockHorizontal = false;
+      touchStartX = 0;
+      touchStartY = 0;
+      touchCurrentX = 0;
+    }
+
+    pagesEl.addEventListener('touchstart', (e) => {
+      if (!mobileQuery.matches || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      touchTracking = true;
+      touchLockHorizontal = false;
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchCurrentX = t.clientX;
+    }, { passive: true });
+
+    pagesEl.addEventListener('touchmove', (e) => {
+      if (!touchTracking || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      touchCurrentX = t.clientX;
+      const dx = touchCurrentX - touchStartX;
+      const dy = t.clientY - touchStartY;
+
+      if (!touchLockHorizontal) {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        if (Math.abs(dy) >= Math.abs(dx)) {
+          touchTracking = false;
+          return;
+        }
+        touchLockHorizontal = true;
+      }
+
+      if (touchLockHorizontal && e.cancelable) e.preventDefault();
+    }, { passive: false });
+
+    pagesEl.addEventListener('touchend', () => {
+      if (!touchTracking || !touchLockHorizontal) {
+        resetTouchSwipe();
+        return;
+      }
+      const dx = touchCurrentX - touchStartX;
+      if (Math.abs(dx) < 40) {
+        resetTouchSwipe();
+        return;
+      }
+      handleMobileSwipe(dx < 0 ? 'next' : 'prev');
+      resetTouchSwipe();
+    }, { passive: true });
+
+    pagesEl.addEventListener('touchcancel', resetTouchSwipe, { passive: true });
 
     mobileQuery.addEventListener('change', rerenderByViewport);
     tabletQuery.addEventListener('change', rerenderByViewport);
