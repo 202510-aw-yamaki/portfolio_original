@@ -1,0 +1,52 @@
+﻿実装可否: 可能。
+
+目的
+- 3ページ(Profile/Portfolio/Skills)のサンプル文言をJSONで差し替え可能にする。
+- 編集用HTMLで入力し、JSONファイルとして保存(ダウンロード)できるようにする。
+- JSONが存在しない場合は既存サンプル表示を維持する。
+
+配置
+- 編集用ページ: C:\Users\hiita\src\portfolio_original\yh_portfolio\content_editor.html
+- 読み込みJSON: C:\Users\hiita\src\portfolio_original\yh_portfolio\content.json
+
+JSON仕様(案)
+{
+  "profile": {
+    "sections": [
+      {"key":"概要","rows":["...","...","..."],"note":"..."},
+      {"key":"経歴","rows":["...","...","..."],"note":"..."},
+      {"key":"実績","rows":["...","...","..."],"note":"..."},
+      {"key":"強み","rows":["...","...","..."],"note":"..."},
+      {"key":"学習","rows":["...","...","..."],"note":"..."},
+      {"key":"希望","rows":["...","...","..."],"note":"..."}
+    ]
+  },
+  "portfolio": {
+    "works": [
+      {
+        "id":"work-01",
+        "title":"...",
+        "short":"...",
+        "tags":["UI","Web"],
+        "detail":"...",
+        "pageUrl":"...",
+        "downloadUrl":"..."
+      }
+    ],
+    "featured":["work-01","work-02","work-03"]
+  },
+  "skills": {
+    "certs": [
+      {"name":"...","desc":"...","date":"YYYY/MM/DD","org":"..."}
+    ],
+    "tools": [
+      {"name":"...","levelText":"...","stars":2,"category":"..."}
+    ]
+  }
+}
+
+挙動
+- 各ページは content.json をfetchして読み込み。
+- JSONが未配置/読込失敗/配列が空のときは既存サンプルを表示。
+- 編集ページは入力内容を content.json としてダウンロード保存する。
+  保存後、yh_portfolio直下に配置すれば差し替え表示される。

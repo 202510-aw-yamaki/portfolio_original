@@ -54,7 +54,7 @@
         <section class="corkboard" aria-label="コルクボード">
           <div class="board-inner">
             <!-- 資格エリア（左 800） -->
-            <div class="area cert" aria-label="資格">
+            <div class="area cert" id="certArea" aria-label="資格">
               <!-- ここから下はダミーです。実データに差し替えてください。 -->
               <article class="paper cert" style="--tilt:-1.2deg;">
                 <h3>資格名A<br>（2行目）</h3>
@@ -115,7 +115,7 @@
             </div>
 
             <!-- ツールエリア（右 400） -->
-            <div class="area tool" aria-label="使用ツール">
+            <div class="area tool" id="toolArea" aria-label="使用ツール">
               <!-- ここから下はダミーです。実データに差し替えてください。 -->
               <article class="paper tool" style="--tilt:0.6deg;">
                 <h3>ツール名A</h3>
@@ -155,5 +155,102 @@
       </nav>
     </footer>
   </article>
+  <script>
+    const DATA_URL = 'content.json';
+    const DEFAULT_SKILLS = {
+      certs: [
+        { name: '資格名A（2行目）', desc: '◯◯検定', date: '2025/12/24', org: '◯◯協会' },
+        { name: '資格名B', desc: '◯◯資格', date: '2025/10/01', org: '◯◯機構' },
+        { name: '資格名C', desc: '◯◯検定', date: '2025/08/15', org: '◯◯協会' },
+        { name: '資格名D', desc: '◯◯講習', date: '2025/06/30', org: '◯◯センター' },
+        { name: '資格名E', desc: '◯◯認定', date: '2025/04/20', org: '◯◯機関' },
+        { name: '資格名F', desc: '◯◯検定', date: '2025/02/03', org: '◯◯団体' },
+        { name: '資格名G', desc: '◯◯資格', date: '2024/12/10', org: '◯◯協会' },
+        { name: '資格名H', desc: '◯◯認定', date: '2024/09/01', org: '◯◯機構' }
+      ],
+      tools: [
+        { name: 'ツール名A', levelText: '日常使い', stars: 2, category: '制作補助' },
+        { name: 'ツール名B', levelText: '学習中', stars: 1, category: '開発' },
+        { name: 'ツール名C', levelText: '日常使い', stars: 2, category: 'デザイン' },
+        { name: 'ツール名D', levelText: '学習中', stars: 1, category: '学習' }
+      ]
+    };
+
+    const certArea = document.getElementById('certArea');
+    const toolArea = document.getElementById('toolArea');
+    const certTilts = [-1.2, 0.8, -0.6, 1.1, 0.4, -0.9, 0.7, -0.3];
+    const toolTilts = [0.6, -0.8, 0.3, -0.4, 0.5, -0.5];
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function normalizeSkills(raw) {
+      if (!raw) return null;
+      const certs = Array.isArray(raw.certs) ? raw.certs : [];
+      const tools = Array.isArray(raw.tools) ? raw.tools : [];
+      if (certs.length === 0 && tools.length === 0) return null;
+      return { certs, tools };
+    }
+
+    function renderCerts(list) {
+      certArea.innerHTML = list.map((c, index) => {
+        const tilt = certTilts[index % certTilts.length];
+        const name = escapeHtml(c.name || '');
+        const desc = escapeHtml(c.desc || '');
+        const date = escapeHtml(c.date || '');
+        const org = escapeHtml(c.org || '');
+        return `
+          <article class="paper cert" style="--tilt:${tilt}deg;">
+            <h3>${name || '資格名'}</h3>
+            <div class="mid">何の資格か：${desc || '—'}<br>取得：${date || '—'}</div>
+            <div class="bottom">主催：${org || '—'}</div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderTools(list) {
+      toolArea.innerHTML = list.map((t, index) => {
+        const tilt = toolTilts[index % toolTilts.length];
+        const name = escapeHtml(t.name || '');
+        const levelText = escapeHtml(t.levelText || '');
+        const stars = Math.max(1, Math.min(3, Number(t.stars) || 1));
+        const starText = '★'.repeat(stars);
+        const category = escapeHtml(t.category || '');
+        return `
+          <article class="paper tool" style="--tilt:${tilt}deg;">
+            <h3>${name || 'ツール名'}</h3>
+            <div class="mid">どれくらい使えるか：${levelText || '—'} <span class="rate">${starText}</span></div>
+            <div class="bottom">系統：${category || '—'}</div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    async function loadSkillsData() {
+      try {
+        const res = await fetch(DATA_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load content.json');
+        const data = await res.json();
+        const normalized = normalizeSkills(data?.skills);
+        if (!normalized) throw new Error('No skills data');
+        const certs = normalized.certs.length ? normalized.certs : DEFAULT_SKILLS.certs;
+        const tools = normalized.tools.length ? normalized.tools : DEFAULT_SKILLS.tools;
+        renderCerts(certs);
+        renderTools(tools);
+      } catch (e) {
+        renderCerts(DEFAULT_SKILLS.certs);
+        renderTools(DEFAULT_SKILLS.tools);
+      }
+    }
+
+    loadSkillsData();
+  </script>
 </body>
 </html>

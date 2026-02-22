@@ -68,7 +68,8 @@
     const closeBtn = document.getElementById('closeBtn');
     const dim = document.getElementById('dim');
 
-    const sections = [
+    const DATA_URL = 'content.json';
+    const DEFAULT_SECTIONS = [
       {
         key: '概要',
         title: '概要 / About',
@@ -102,6 +103,7 @@
         note: '働き方は柔軟に相談可能です。'
       }
     ];
+    let sections = DEFAULT_SECTIONS;
 
     const colors = ['#ffd9b3', '#ffbe9f', '#ffc79c', '#ffb782', '#ffc499', '#ffcf9f'];
     const activeColor = '#f07c2c';
@@ -134,6 +136,7 @@
     };
 
     const createDonut = () => {
+      svg.innerHTML = '';
       sections.forEach((section, index) => {
         const start = index * 60;
         const end = start + 60;
@@ -172,6 +175,34 @@
     };
 
     const varColor = (name) => getComputedStyle(document.documentElement).getPropertyValue(name);
+
+    function normalizeProfileSections(rawSections) {
+      if (!Array.isArray(rawSections)) return null;
+      const map = new Map(rawSections.filter(Boolean).map((s) => [s.key, s]));
+      return DEFAULT_SECTIONS.map((base, index) => {
+        const src = map.get(base.key) || rawSections[index];
+        if (!src) return base;
+        const rows = Array.isArray(src.rows) ? src.rows : [];
+        const bullets = [0, 1, 2].map((i) => {
+          const value = rows[i];
+          return value && String(value).trim() ? String(value) : base.bullets[i];
+        });
+        const note = typeof src.note === 'string' && src.note.trim() ? src.note : base.note;
+        return { key: base.key, title: base.title, bullets, note };
+      });
+    }
+
+    async function loadProfileData() {
+      try {
+        const res = await fetch(DATA_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load content.json');
+        const data = await res.json();
+        const normalized = normalizeProfileSections(data?.profile?.sections);
+        if (normalized) sections = normalized;
+      } catch (e) {
+        sections = DEFAULT_SECTIONS;
+      }
+    }
 
     let activePath = null;
 
@@ -258,8 +289,11 @@
       }
     };
 
-    createDonut();
-    fitDonutToMain();
+    async function init() {
+      await loadProfileData();
+      createDonut();
+      fitDonutToMain();
+    }
 
     if ('ResizeObserver' in window) {
       const ro = new ResizeObserver(() => fitDonutToMain());
@@ -269,6 +303,8 @@
 
     window.addEventListener('resize', fitDonutToMain);
     window.addEventListener('orientationchange', fitDonutToMain);
+
+    init();
   </script>
 </body>
 </html>

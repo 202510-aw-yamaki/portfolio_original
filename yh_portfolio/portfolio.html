@@ -97,7 +97,8 @@
     const leftHeader = spreadLeft.parentElement.querySelector('.page-header');
     const rightHeader = spreadRight.parentElement.querySelector('.page-header');
 
-    const works = [
+    const DATA_URL = 'content.json';
+    const DEFAULT_WORKS = [
       {
         id: 'work-01',
         title: '作品A（仮）',
@@ -154,11 +155,65 @@
       }
     ];
 
-    const featured = ['work-01', 'work-02', 'work-03'];
+    const DEFAULT_FEATURED = ['work-01', 'work-02', 'work-03'];
+    let works = DEFAULT_WORKS.map((w) => ({ ...w, tags: [...w.tags] }));
+    let featured = DEFAULT_FEATURED.slice();
     const mobileQuery = window.matchMedia('(max-width: 767px)');
     const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
     let spreadPageIndex = 0;
     let currentDetailIndex = -1;
+
+    function normalizeWorks(list) {
+      if (!Array.isArray(list)) return null;
+      const normalized = list
+        .filter((w) => w && (w.title || w.short || w.detail || (w.tags && w.tags.length)))
+        .map((w, index) => {
+          const id = typeof w.id === 'string' && w.id.trim()
+            ? w.id.trim()
+            : `work-${String(index + 1).padStart(2, '0')}`;
+          const tags = Array.isArray(w.tags)
+            ? w.tags.map((t) => String(t)).filter((t) => t.trim())
+            : [];
+          return {
+            id,
+            title: w.title ? String(w.title) : '',
+            short: w.short ? String(w.short) : '',
+            tags,
+            detail: w.detail ? String(w.detail) : '',
+            pageUrl: w.pageUrl ? String(w.pageUrl) : '',
+            downloadUrl: w.downloadUrl ? String(w.downloadUrl) : ''
+          };
+        });
+      return normalized.length ? normalized : null;
+    }
+
+    function normalizeFeatured(ids, list) {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return list.slice(0, 3).map((w) => w.id);
+      }
+      const set = new Set(list.map((w) => w.id));
+      const filtered = Array.from(new Set(ids.filter((id) => set.has(id))));
+      return filtered.length ? filtered : list.slice(0, 3).map((w) => w.id);
+    }
+
+    async function loadPortfolioData() {
+      try {
+        const res = await fetch(DATA_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load content.json');
+        const data = await res.json();
+        const normalizedWorks = normalizeWorks(data?.portfolio?.works);
+        if (normalizedWorks) {
+          works = normalizedWorks;
+          featured = normalizeFeatured(data?.portfolio?.featured, works);
+        } else {
+          works = DEFAULT_WORKS.map((w) => ({ ...w, tags: [...w.tags] }));
+          featured = DEFAULT_FEATURED.slice();
+        }
+      } catch (e) {
+        works = DEFAULT_WORKS.map((w) => ({ ...w, tags: [...w.tags] }));
+        featured = DEFAULT_FEATURED.slice();
+      }
+    }
 
     function getFeaturedIds() {
       return mobileQuery.matches ? featured.slice(0, 2) : featured;
@@ -580,7 +635,12 @@
     mobileQuery.addEventListener('change', rerenderByViewport);
     tabletQuery.addEventListener('change', rerenderByViewport);
 
-    renderCover();
+    async function init() {
+      await loadPortfolioData();
+      renderCover();
+    }
+
+    init();
   </script>
 </body>
 </html>
