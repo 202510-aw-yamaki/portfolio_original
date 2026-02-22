@@ -54,7 +54,7 @@
               <div id="spreadLeft"></div>
             </div>
 
-            <div class="page" id="rightPage" role="group" aria-label="右ページ">
+            <div class="page" role="group" aria-label="右ページ">
               <div class="page-header">
                 <h2 id="rightTitle">状態説明</h2>
                 <button class="mini-btn" id="toSpreadBtn" type="button" aria-label="一覧へ戻る">一覧へ戻る</button>
@@ -82,6 +82,7 @@
   <script>
     const book = document.getElementById('book');
     const featuredList = document.getElementById('featuredList');
+    const coverEl = document.getElementById('cover');
     const spreadLeft = document.getElementById('spreadLeft');
     const spreadRight = document.getElementById('spreadRight');
     const pagesEl = document.querySelector('.pages');
@@ -155,7 +156,7 @@
 
     const featured = ['work-01', 'work-02', 'work-03'];
     const mobileQuery = window.matchMedia('(max-width: 767px)');
-    const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1199px)');
+    const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
     let spreadPageIndex = 0;
     let currentDetailIndex = -1;
 
@@ -165,7 +166,7 @@
 
     function getSpreadConfig() {
       if (mobileQuery.matches) {
-        return { mode: 'mobile', perPage: 2, leftCount: 2, rightCount: 0 };
+        return { mode: 'mobile', perPage: 2, leftCount: 1, rightCount: 1 };
       }
       if (tabletQuery.matches) {
         return { mode: 'tablet', perPage: 4, leftCount: 2, rightCount: 2 };
@@ -271,11 +272,9 @@
       spreadLeft.innerHTML = `
         <div class="spread-list" aria-label="Left works list">${leftItems.map((w) => spreadItemHtml(w)).join('')}</div>
       `;
-      spreadRight.innerHTML = config.mode === 'mobile'
-        ? ''
-        : `
-          <div class="spread-list" aria-label="Right works list">${rightItems.map((w) => spreadItemHtml(w)).join('')}</div>
-        `;
+      spreadRight.innerHTML = `
+        <div class="spread-list" aria-label="Right works list">${rightItems.map((w) => spreadItemHtml(w)).join('')}</div>
+      `;
       bookPagination.innerHTML = pager;
 
       bindSpreadItems(spreadLeft);
@@ -508,6 +507,75 @@
     }, { passive: true });
 
     pagesEl.addEventListener('touchcancel', resetTouchSwipe, { passive: true });
+
+    let coverTouchTracking = false;
+    let coverTouchStartX = 0;
+    let coverTouchStartY = 0;
+
+    coverEl.addEventListener('touchstart', (e) => {
+      if (!mobileQuery.matches || e.touches.length !== 1) return;
+      if (book.getAttribute('data-state') !== 'cover') return;
+      const t = e.touches[0];
+      coverTouchTracking = true;
+      coverTouchStartX = t.clientX;
+      coverTouchStartY = t.clientY;
+    }, { passive: true });
+
+    coverEl.addEventListener('touchmove', (e) => {
+      if (!coverTouchTracking || e.touches.length !== 1) return;
+      if (book.getAttribute('data-state') !== 'cover') return;
+      const t = e.touches[0];
+      const dx = t.clientX - coverTouchStartX;
+      const dy = t.clientY - coverTouchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    const resetCoverTouch = () => {
+      coverTouchTracking = false;
+      coverTouchStartX = 0;
+      coverTouchStartY = 0;
+    };
+    coverEl.addEventListener('touchend', resetCoverTouch, { passive: true });
+    coverEl.addEventListener('touchcancel', resetCoverTouch, { passive: true });
+
+    // Block browser edge-swipe back/forward on mobile by capturing horizontal
+    // gestures that start near the viewport edges.
+    let edgeTracking = false;
+    let edgeSwipeStartX = 0;
+    let edgeSwipeStartY = 0;
+    const EDGE_GUARD_PX = 28;
+
+    function resetEdgeSwipe() {
+      edgeTracking = false;
+      edgeSwipeStartX = 0;
+      edgeSwipeStartY = 0;
+    }
+
+    document.addEventListener('touchstart', (e) => {
+      if (!mobileQuery.matches || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const x = t.clientX;
+      const width = window.innerWidth || document.documentElement.clientWidth || 0;
+      edgeTracking = x <= EDGE_GUARD_PX || x >= (width - EDGE_GUARD_PX);
+      if (!edgeTracking) return;
+      edgeSwipeStartX = x;
+      edgeSwipeStartY = t.clientY;
+    }, { passive: true, capture: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!edgeTracking || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - edgeSwipeStartX;
+      const dy = t.clientY - edgeSwipeStartY;
+      if (Math.abs(dx) > Math.abs(dy) && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false, capture: true });
+
+    document.addEventListener('touchend', resetEdgeSwipe, { passive: true, capture: true });
+    document.addEventListener('touchcancel', resetEdgeSwipe, { passive: true, capture: true });
 
     mobileQuery.addEventListener('change', rerenderByViewport);
     tabletQuery.addEventListener('change', rerenderByViewport);

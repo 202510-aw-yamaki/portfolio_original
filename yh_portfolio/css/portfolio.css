@@ -1,5 +1,10 @@
 body {
   overflow: hidden;
+  overscroll-behavior-x: none;
+}
+
+html {
+  overscroll-behavior-x: none;
 }
 
 /* ヘッダーでリンクが2行化しないよう、ナビ全体を必要時に2段目へ移す */
@@ -1062,7 +1067,7 @@ body {
       100% { opacity: 0; }
     }
 
-    @media (min-width: 768px) and (max-width: 1199px) {
+    @media (min-width: 768px) and (max-width: 1023px) {
       .book {
         --book-open-width: min(980px, calc(100% - 24px));
         --book-height: min(620px, calc(100% - 12px));
@@ -1154,7 +1159,7 @@ body {
 
       .pages {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto;
         gap: 10px;
         padding: 10px;
         border-radius: 16px;
@@ -1165,27 +1170,8 @@ body {
         display: none;
       }
 
-      .book[data-state="detail"] .pages {
-        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto;
-      }
-
-      .book[data-state="spread"][data-spread-mode="mobile"] #rightPage {
-        display: none;
-      }
-
-      .book[data-state="detail"] #rightPage {
-        display: flex;
-      }
-
-      .book[data-state="spread"][data-spread-mode="mobile"] .spine {
-        display: block;
-        left: 0;
-        transform: none;
-        width: 14px;
-        border-radius: 10px 0 0 10px;
-      }
-
       .book-pagination {
+        grid-row: 3;
         padding: 6px 4px 2px;
       }
 
