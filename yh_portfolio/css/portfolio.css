@@ -308,7 +308,7 @@ body {
     .bookmark {
       position: absolute;
       top: 110px;
-      right: 2px;
+      right: 0;
       width: 42px;
       height: 150px;
       border: none;
@@ -326,7 +326,8 @@ body {
     }
 
     .book[data-state="cover"] .bookmark {
-      right: -12px;
+      left: calc(var(--cover-width) - 14px);
+      right: auto;
       transform: none;
       z-index: 40;
     }
