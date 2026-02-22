@@ -953,6 +953,161 @@ body {
       100% { opacity: 0; }
     }
 
+    @media (max-width: 767px) {
+      .book {
+        top: 50%;
+        left: 50%;
+        --book-closed-width: min(420px, calc(100vw - 20px));
+        --book-open-width: min(420px, calc(100vw - 20px));
+        --book-height: min(560px, calc(100% - 16px));
+        --book-spine-width: 20px;
+        --cover-extra-width: 10px;
+      }
+
+      .book[data-state="spread"],
+      .book[data-state="detail"] {
+        left: 50%;
+      }
+
+      .book[data-state="cover"] .cover {
+        width: calc(100% - 8px);
+        padding: 18px 18px 16px 30px;
+      }
+
+      .cover-title h1 {
+        font-size: clamp(18px, 7vw, 28px);
+      }
+
+      .cover-title .subtitle {
+        font-size: 11px;
+      }
+
+      .featured-list {
+        margin-top: 12px;
+        gap: 10px;
+      }
+
+      .featured-item {
+        padding: 10px 12px;
+      }
+
+      .featured-item .title {
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      .featured-item .desc {
+        font-size: 11.5px;
+        line-height: 1.45;
+        -webkit-line-clamp: 2;
+      }
+
+      .cover-hint {
+        padding-top: 10px;
+        font-size: 11px;
+      }
+
+      .pages {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px;
+        padding: 10px;
+        border-radius: 16px;
+      }
+
+      .spine {
+        display: none;
+      }
+
+      .page {
+        border-radius: 12px;
+        padding: 12px 12px 10px;
+        gap: 10px;
+      }
+
+      .page-header {
+        gap: 8px;
+        padding-bottom: 8px;
+      }
+
+      .page-header h2 {
+        font-size: 14px;
+      }
+
+      .mini-btn {
+        padding: 6px 9px;
+        font-size: 11px;
+      }
+
+      .spread-list {
+        gap: 10px;
+      }
+
+      .spread-item {
+        padding: 10px 12px;
+      }
+
+      .spread-item .title {
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+
+      .spread-item .desc {
+        font-size: 11.5px;
+        line-height: 1.45;
+      }
+
+      .chips {
+        gap: 6px;
+      }
+
+      .chip {
+        padding: 4px 8px;
+        font-size: 10.5px;
+      }
+
+      .book[data-state="spread"] .page-header h2,
+      .book[data-state="detail"] .page-header h2 {
+        font-size: 14px;
+      }
+
+      .detail {
+        gap: 10px;
+      }
+
+      .detail h3 {
+        font-size: 13px;
+      }
+
+      .detail p {
+        font-size: 11.5px;
+        line-height: 1.6;
+      }
+
+      .book[data-state="detail"] .detail h3 {
+        font-size: 14px;
+      }
+
+      .book[data-state="detail"] .detail p {
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .bookmark {
+        top: 108px;
+        width: 34px;
+        height: 112px;
+        border-radius: 12px;
+        font-size: 22px;
+      }
+
+      .book[data-state="cover"] .bookmark {
+        left: calc(100% - 16px);
+        right: auto;
+        transform: none;
+      }
+    }
+
     /* 見た目だけの補助線（本の綴じ） */
 .spine {
   position: absolute;
