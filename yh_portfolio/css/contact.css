@@ -425,19 +425,19 @@ input:focus-visible {
   font-weight: 800;
   letter-spacing: 0.5px;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
+  box-shadow: var(--btn-shadow-rest);
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   font-size: clamp(12px, 2.8vw, 15px);
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #ffd3a6, #f28f42);
+  background: var(--btn-grad-primary);
   color: var(--text-main);
 }
 
 .reset-btn,
 .success-reset-btn {
-  background: linear-gradient(135deg, #fff2e0, #ffd6b0);
+  background: var(--btn-grad-secondary);
   color: var(--muted-text);
 }
 
@@ -448,7 +448,7 @@ input:focus-visible {
 .success-reset-btn:hover,
 .success-reset-btn:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
+  box-shadow: var(--btn-shadow-hover);
   outline: none;
 }
 
@@ -456,7 +456,7 @@ input:focus-visible {
 .reset-btn:active,
 .success-reset-btn:active {
   transform: translateY(0);
-  box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
+  box-shadow: var(--btn-shadow-active);
 }
 
 .sticky-wrapper.is-animating .sticky-note {

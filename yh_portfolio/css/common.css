@@ -7,6 +7,11 @@
   --muted-text: #7a5a42;
   --panel-bg: #fffaf4;
   --shadow: 0 14px 38px rgba(120, 70, 30, 0.14);
+  --btn-grad-primary: linear-gradient(135deg, #ffd3a6, #f28f42);
+  --btn-grad-secondary: linear-gradient(135deg, #fff2e0, #ffd6b0);
+  --btn-shadow-rest: 0 10px 20px rgba(120, 70, 30, 0.14);
+  --btn-shadow-hover: 0 12px 22px rgba(120, 70, 30, 0.18);
+  --btn-shadow-active: 0 8px 16px rgba(120, 70, 30, 0.16);
 }
 
 * {
@@ -175,21 +180,21 @@ nav a[aria-current="page"] {
   white-space: normal;
   overflow-wrap: anywhere;
   color: var(--text-main);
-  background: linear-gradient(135deg, #ffd3a6, #f28f42);
-  box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
+  background: var(--btn-grad-primary);
+  box-shadow: var(--btn-shadow-rest);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .footer-card:hover,
 .footer-card:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
+  box-shadow: var(--btn-shadow-hover);
   outline: none;
 }
 
 .footer-card:active {
   transform: translateY(0);
-  box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
+  box-shadow: var(--btn-shadow-active);
 }
 
 .footer-card.is-current {
@@ -208,7 +213,7 @@ nav a[aria-current="page"] {
 .nav-button {
   display: block;
   width: 100%;
-  background: linear-gradient(135deg, #ffd3a6, #f28f42);
+  background: var(--btn-grad-primary);
   color: var(--text-main);
   text-align: center;
   padding: 18px 14px;
@@ -216,20 +221,68 @@ nav a[aria-current="page"] {
   text-decoration: none;
   font-weight: 700;
   letter-spacing: 0.6px;
-  box-shadow: 0 10px 20px rgba(120, 70, 30, 0.14);
+  box-shadow: var(--btn-shadow-rest);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-button:hover,
 .nav-button:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(120, 70, 30, 0.18);
+  box-shadow: var(--btn-shadow-hover);
   outline: none;
 }
 
 .nav-button:active {
   transform: translateY(0);
-  box-shadow: 0 8px 16px rgba(120, 70, 30, 0.16);
+  box-shadow: var(--btn-shadow-active);
+}
+
+.page-nav {
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--btn-grad-primary);
+  color: rgba(65, 30, 12, 0.95);
+  font-weight: 800;
+  font-size: clamp(11px, 0.8vw, 13px);
+  box-shadow: var(--btn-shadow-rest);
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.page-nav:hover:not(:disabled),
+.page-nav:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--btn-shadow-hover);
+  filter: brightness(1.02);
+  outline: none;
+}
+
+.page-nav:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(65, 30, 12, 0.86);
+  background: rgba(255, 246, 238, 0.95);
+  border: 1px solid rgba(120, 70, 30, 0.12);
+  box-shadow: 0 8px 14px rgba(120, 70, 30, 0.10);
 }
 
 .content-panel ul {
@@ -280,7 +333,26 @@ nav a[aria-current="page"] {
   }
 }
 
+/* Breakpoint policy:
+   mobile: <= 767px (default target)
+   tablet: 768px - 1023px
+   desktop: >= 1024px
+*/
 @media (max-width: 767px) {
+  .chips {
+    gap: 6px;
+  }
+
+  .chip {
+    padding: 4px 8px;
+    font-size: 10.5px;
+  }
+
+  .page-nav {
+    padding: 6px 11px;
+    font-size: 11px;
+  }
+
   header {
     min-height: 84px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
