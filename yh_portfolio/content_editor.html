@@ -162,9 +162,11 @@
     <section class="panel">
       <h2>JSON出力</h2>
       <div class="actions">
+        <button type="button" id="loadJsonBtn" class="secondary">JSON読込</button>
         <button type="button" id="saveJsonBtn">JSON保存</button>
         <span class="note">出力プレビューも更新されます。</span>
       </div>
+      <input type="file" id="jsonFileInput" accept="application/json" style="display:none" />
       <label for="jsonPreview">プレビュー</label>
       <textarea id="jsonPreview" class="preview" readonly></textarea>
     </section>
@@ -172,12 +174,66 @@
 
   <script>
     const PROFILE_KEYS = [
-      { key: '概要', title: '概要' },
-      { key: '経歴', title: '経歴' },
-      { key: '実績', title: '実績' },
-      { key: '強み', title: '強み' },
-      { key: '学習', title: '学習' },
-      { key: '希望', title: '希望' }
+      {
+        key: '概要',
+        title: '概要',
+        placeholders: [
+          '例）氏名: 山田太郎 / 29歳 / 東京在住',
+          '例）希望職種: フロントエンドエンジニア',
+          '例）3行サマリー: UI/UX志向・迅速な試作・丁寧な運用'
+        ],
+        notePlaceholder: '補足メモ: 必要に応じて差し替えてください。'
+      },
+      {
+        key: '経歴',
+        title: '経歴',
+        placeholders: [
+          '例）製造業: 生産ライン改善に従事 (2年)',
+          '例）店舗運営: 接客・売場企画を担当 (3年)',
+          '例）転身: Web開発へシフトし現職でUI改善に従事'
+        ],
+        notePlaceholder: '補足メモ'
+      },
+      {
+        key: '実績',
+        title: '実績',
+        placeholders: [
+          '例）社内ポータルのUI刷新で離脱率20%改善',
+          '例）受注管理画面のモバイル対応を主導',
+          '例）LP A/BテストでCVR+15%'
+        ],
+        notePlaceholder: '補足メモ'
+      },
+      {
+        key: '強み',
+        title: '強み',
+        placeholders: [
+          '例）複雑な要件をビジュアルに整理',
+          '例）アクセシビリティ配慮の実装',
+          '例）デザイナー/企画との橋渡し'
+        ],
+        notePlaceholder: '補足メモ'
+      },
+      {
+        key: '学習',
+        title: '学習',
+        placeholders: [
+          '例）TypeScript + ReactでのUI開発',
+          '例）SVG/Canvasでのインタラクション設計',
+          '例）色彩・タイポグラフィ設計を継続学習'
+        ],
+        notePlaceholder: '例）資格: 色彩検定2級 / TOEIC780'
+      },
+      {
+        key: '希望',
+        title: '希望',
+        placeholders: [
+          '例）入社可能時期: 2024年6月以降',
+          '例）勤務地: 首都圏 / リモート歓迎',
+          '例）志向: 長期でUIを育てられる環境を希望'
+        ],
+        notePlaceholder: '例）働き方は柔軟に相談可能です。'
+      }
     ];
 
     const TAG_OPTIONS = ['UI', 'Web', '実装', '設計', '業務', '分析', '運用', '改善', '標準化', 'CV改善'];
@@ -189,6 +245,8 @@
     const addWorkBtn = document.getElementById('addWorkBtn');
     const addCertBtn = document.getElementById('addCertBtn');
     const addToolBtn = document.getElementById('addToolBtn');
+    const loadJsonBtn = document.getElementById('loadJsonBtn');
+    const jsonFileInput = document.getElementById('jsonFileInput');
     const saveJsonBtn = document.getElementById('saveJsonBtn');
     const jsonPreview = document.getElementById('jsonPreview');
 
@@ -201,19 +259,19 @@
         <div class="row-3">
           <div>
             <label>1行目</label>
-            <input type="text" data-row="0" />
+            <input type="text" data-row="0" placeholder="${section.placeholders[0]}" />
           </div>
           <div>
             <label>2行目</label>
-            <input type="text" data-row="1" />
+            <input type="text" data-row="1" placeholder="${section.placeholders[1]}" />
           </div>
           <div>
             <label>3行目</label>
-            <input type="text" data-row="2" />
+            <input type="text" data-row="2" placeholder="${section.placeholders[2]}" />
           </div>
         </div>
         <label>補足メモ</label>
-        <textarea data-note></textarea>
+        <textarea data-note placeholder="${section.notePlaceholder}"></textarea>
       `;
       return wrap;
     }
@@ -236,9 +294,9 @@
       group.innerHTML = `
         <h3>作品 ${index + 1}</h3>
         <label>作品名</label>
-        <input type="text" data-field="title" />
+        <input type="text" data-field="title" placeholder="例）作品A（仮）" />
         <label>1行説明</label>
-        <input type="text" data-field="short" />
+        <input type="text" data-field="short" placeholder="例）UI改善を中心に、導線整理と視認性向上を行った事例です。" />
         <label>UIチップ選択</label>
       `;
       const chipBox = createTagSelector();
@@ -247,13 +305,13 @@
       const custom = document.createElement('div');
       custom.innerHTML = `
         <label>チップ自由入力(カンマ区切り)</label>
-        <input type="text" data-field="tagsCustom" />
+        <input type="text" data-field="tagsCustom" placeholder="例）UI,設計,改善" />
       `;
       group.appendChild(custom);
       const detail = document.createElement('div');
       detail.innerHTML = `
         <label>詳細説明</label>
-        <textarea data-field="detail"></textarea>
+        <textarea data-field="detail" placeholder="例）背景・課題\n- 〜〜\n\n対応\n- 〜〜\n\n結果\n- 〜〜"></textarea>
         <div class="row">
           <div>
             <label>リンク① 作品紹介ページ</label>
@@ -276,13 +334,13 @@
       group.innerHTML = `
         <h3>資格 ${index + 1}</h3>
         <label>資格名</label>
-        <input type="text" data-field="name" />
+        <input type="text" data-field="name" placeholder="例）資格名A" />
         <label>何の資格か</label>
-        <input type="text" data-field="desc" />
+        <input type="text" data-field="desc" placeholder="例）◯◯検定" />
         <label>取得年月日</label>
-        <input type="text" data-field="date" placeholder="YYYY/MM/DD" />
+        <input type="text" data-field="date" placeholder="例）2025/12/24" />
         <label>主催</label>
-        <input type="text" data-field="org" />
+        <input type="text" data-field="org" placeholder="例）◯◯協会" />
       `;
       return group;
     }
@@ -294,9 +352,9 @@
       group.innerHTML = `
         <h3>ツール ${index + 1}</h3>
         <label>ツール名</label>
-        <input type="text" data-field="name" />
+        <input type="text" data-field="name" placeholder="例）ツール名A" />
         <label>どれくらい使えるか</label>
-        <input type="text" data-field="levelText" />
+        <input type="text" data-field="levelText" placeholder="例）日常使い / 学習中 / 実務経験あり" />
         <label>★評価 (1〜3)</label>
         <div class="chip-list" data-field="stars">
           <label><input type="radio" name="stars-${index}" value="1" />★1</label>
@@ -304,7 +362,7 @@
           <label><input type="radio" name="stars-${index}" value="3" />★3</label>
         </div>
         <label>系統</label>
-        <input type="text" data-field="category" />
+        <input type="text" data-field="category" placeholder="例）制作補助 / 開発 / デザイン / 学習" />
       `;
       return group;
     }
@@ -313,6 +371,7 @@
       const count = workList.querySelectorAll('[data-type="work"]').length;
       if (count >= 6) return;
       workList.appendChild(createWorkGroup(count));
+      refreshStarNames();
     }
 
     function addCert() {
@@ -323,6 +382,7 @@
     function addTool() {
       const count = toolList.querySelectorAll('[data-type="tool"]').length;
       toolList.appendChild(createToolGroup(count));
+      refreshStarNames();
     }
 
     function collectProfile() {
@@ -423,6 +483,117 @@
       URL.revokeObjectURL(url);
     }
 
+    function refreshStarNames() {
+      toolList.querySelectorAll('[data-type="tool"]').forEach((el, index) => {
+        el.querySelectorAll('input[type="radio"]').forEach((input) => {
+          input.name = `stars-${index}`;
+        });
+      });
+    }
+
+    function fillProfile(sections) {
+      if (!Array.isArray(sections)) return;
+      sections.forEach((sec) => {
+        const wrap = profileSections.querySelector(`[data-key="${sec.key}"]`);
+        if (!wrap) return;
+        if (Array.isArray(sec.rows)) {
+          wrap.querySelectorAll('input[data-row]').forEach((input, i) => {
+            input.value = sec.rows[i] || '';
+          });
+        }
+        const note = wrap.querySelector('[data-note]');
+        if (note) note.value = sec.note || '';
+      });
+    }
+
+    function fillWorks(works) {
+      if (!Array.isArray(works)) return;
+      workList.innerHTML = '';
+      works.slice(0, 6).forEach((work, index) => {
+        const group = createWorkGroup(index);
+        group.querySelector('[data-field="title"]').value = work.title || '';
+        group.querySelector('[data-field="short"]').value = work.short || '';
+        group.querySelector('[data-field="detail"]').value = work.detail || '';
+        group.querySelector('[data-field="pageUrl"]').value = work.pageUrl || '';
+        group.querySelector('[data-field="downloadUrl"]').value = work.downloadUrl || '';
+
+        const tagSet = new Set(Array.isArray(work.tags) ? work.tags.map((t) => String(t)) : []);
+        group.querySelectorAll('[data-field="tags"] input[type="checkbox"]').forEach((cb) => {
+          cb.checked = tagSet.has(cb.value);
+          if (cb.checked) tagSet.delete(cb.value);
+        });
+        if (tagSet.size) {
+          group.querySelector('[data-field="tagsCustom"]').value = Array.from(tagSet).join(',');
+        }
+        workList.appendChild(group);
+      });
+      if (workList.children.length === 0) {
+        addWork();
+        addWork();
+      }
+    }
+
+    function fillCerts(certs) {
+      if (!Array.isArray(certs)) return;
+      certList.innerHTML = '';
+      certs.forEach((c, index) => {
+        const group = createCertGroup(index);
+        group.querySelector('[data-field="name"]').value = c.name || '';
+        group.querySelector('[data-field="desc"]').value = c.desc || '';
+        group.querySelector('[data-field="date"]').value = c.date || '';
+        group.querySelector('[data-field="org"]').value = c.org || '';
+        certList.appendChild(group);
+      });
+      if (certList.children.length === 0) {
+        addCert();
+        addCert();
+      }
+    }
+
+    function fillTools(tools) {
+      if (!Array.isArray(tools)) return;
+      toolList.innerHTML = '';
+      tools.forEach((t, index) => {
+        const group = createToolGroup(index);
+        group.querySelector('[data-field="name"]').value = t.name || '';
+        group.querySelector('[data-field="levelText"]').value = t.levelText || '';
+        const stars = Number(t.stars) || 0;
+        if (stars >= 1 && stars <= 3) {
+          const radio = group.querySelector(`input[type="radio"][value="${stars}"]`);
+          if (radio) radio.checked = true;
+        }
+        group.querySelector('[data-field="category"]').value = t.category || '';
+        toolList.appendChild(group);
+      });
+      refreshStarNames();
+      if (toolList.children.length === 0) {
+        addTool();
+        addTool();
+      }
+    }
+
+    function loadJsonObject(data) {
+      fillProfile(data?.profile?.sections);
+      fillWorks(data?.portfolio?.works);
+      fillCerts(data?.skills?.certs);
+      fillTools(data?.skills?.tools);
+      generateJson();
+    }
+
+    function handleJsonFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result || '{}'));
+          loadJsonObject(data);
+        } catch (e) {
+          alert('JSONの読み込みに失敗しました。');
+        }
+      };
+      reader.readAsText(file);
+    }
+
     PROFILE_KEYS.forEach((section) => profileSections.appendChild(createProfileSection(section)));
     addWork();
     addWork();
@@ -430,11 +601,15 @@
     addCert();
     addTool();
     addTool();
+    refreshStarNames();
 
     addWorkBtn.addEventListener('click', addWork);
     addCertBtn.addEventListener('click', addCert);
     addToolBtn.addEventListener('click', addTool);
+    loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
+    jsonFileInput.addEventListener('change', (e) => handleJsonFile(e.target.files[0]));
     saveJsonBtn.addEventListener('click', downloadJson);
+    generateJson();
   </script>
 </body>
 </html>
