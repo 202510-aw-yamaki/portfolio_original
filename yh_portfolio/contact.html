@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YH Portfolio Contact</title>
+  <title>YH Portfolio Contact</title>
   <link rel="stylesheet" href="css/common.css" />
   <link rel="stylesheet" href="css/contact.css" />
 </head>
@@ -45,29 +45,39 @@
 
         <div class="sticky-area">
           <div class="sticky-wrapper" id="stickyWrapper">
-            <div class="pin"></div>
-            <form class="sticky-note" id="contactForm" aria-label="お問い合わせフォーム">
-              <h2>付箋メモに記入して送ってください</h2>
+            <form class="sticky-note" id="contactForm" aria-label="お問い合わせフォーム" novalidate>
+              <h2>お気軽にご連絡ください</h2>
+
               <label for="message">
-                お問い合わせ内容
-                <textarea id="message" name="message" rows="3" aria-describedby="messageHelp" required></textarea>
+                <span class="label-title">お問い合わせ内容 <span class="required-chip">必須</span></span>
+                <textarea id="message" name="message" rows="4" aria-describedby="messageHelp formError" minlength="10" maxlength="1200" required></textarea>
               </label>
+
               <label for="name" class="label-inline">
-                <span>お名前</span>
-                <input id="name" name="name" type="text" placeholder="山田太郎" required />
+                <span class="label-title">お名前 <span class="required-chip">必須</span></span>
+                <input id="name" name="name" type="text" placeholder="山田 太郎" minlength="2" maxlength="40" autocomplete="name" required />
               </label>
+
               <label for="email" class="label-inline">
-                <span>メアド</span>
-                <input id="email" name="email" type="email" placeholder="example@mail.jp" required />
+                <span class="label-title">メール <span class="required-chip">必須</span></span>
+                <input id="email" name="email" type="email" placeholder="example@mail.jp" maxlength="254" autocomplete="email" required />
               </label>
+
               <div class="helper-row">
-                <label for="skipAnimation" style="flex:0 0 auto; gap:8px; align-items:center; font-weight:600; margin:0; flex-direction:row;">
+                <label for="skipAnimation" class="skip-label">
                   <input id="skipAnimation" name="skipAnimation" type="checkbox" />
                   演出をスキップ
                 </label>
-                <span>2日以内に返信します</span>
+                <span>2営業日以内に返信します</span>
               </div>
-              <div class="note" id="messageHelp">返信がない場合はアドレスに間違いがある可能性がありますので<br>お気を付けください</div>
+
+              <div class="note" id="messageHelp">
+                送信できない場合は、アドレスに誤りがないか確認してください。<br />
+                内容は10文字以上で入力してください。
+              </div>
+
+              <div class="field-error" id="formError" role="alert" aria-live="polite"></div>
+
               <div class="actions">
                 <button type="submit" class="submit-btn">送信する</button>
                 <button type="button" class="reset-btn" id="resetButton" aria-live="polite">リセット</button>
@@ -76,15 +86,18 @@
           </div>
 
           <div class="success-card" id="resultCard" role="status" aria-live="polite">
-            <h3>送信しました（デモ）</h3>
-            <p>お問い合わせありがとうございます。デモのため実送信は行われませんが、内容は受信した想定で処理しました。</p>
-            <p>もう一度入力される場合はリセットしてください。</p>
+            <h3>送信しました</h3>
+            <p>お問い合わせありがとうございます。内容を確認し、順次返信します。</p>
+            <p>再入力する場合は下のボタンからフォームを表示してください。</p>
+            <div class="success-actions">
+              <button type="button" class="success-reset-btn" id="resultResetButton">フォームに戻る</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-        <footer class="bottom-bar" aria-label="ボトムバー">
+    <footer class="bottom-bar" aria-label="ボトムバー">
       <div class="bottom-buttons">
         <a class="footer-card" href="profile.html" aria-hidden="false" tabindex="0">プロフィール (Profile)</a>
         <a class="footer-card" href="portfolio.html" aria-hidden="false" tabindex="0">ポートフォリオ (Portfolio)</a>
@@ -100,15 +113,66 @@
     const skipAnimation = document.getElementById('skipAnimation');
     const resultCard = document.getElementById('resultCard');
     const resetButton = document.getElementById('resetButton');
+    const resultResetButton = document.getElementById('resultResetButton');
+    const formError = document.getElementById('formError');
+    const messageInput = document.getElementById('message');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
     const stickyNote = form;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const clearError = () => {
+      formError.textContent = '';
+      formError.classList.remove('is-visible');
+    };
+
+    const showError = (text) => {
+      formError.textContent = text;
+      formError.classList.add('is-visible');
+    };
 
     const setDisabled = (disabled) => {
       form.querySelectorAll('input, textarea, button').forEach((el) => {
         if (el.id === 'resetButton') return;
         el.disabled = disabled;
       });
+      resultResetButton.disabled = false;
+    };
+
+    const validateForm = () => {
+      clearError();
+
+      const messageValue = messageInput.value.trim();
+      const nameValue = nameInput.value.trim();
+      const emailValue = emailInput.value.trim();
+
+      messageInput.setCustomValidity('');
+      nameInput.setCustomValidity('');
+      emailInput.setCustomValidity('');
+
+      if (messageValue.length < 10) {
+        messageInput.setCustomValidity('お問い合わせ内容は10文字以上で入力してください。');
+      }
+
+      if (nameValue.length < 2) {
+        nameInput.setCustomValidity('お名前は2文字以上で入力してください。');
+      }
+
+      if (emailValue.length === 0) {
+        emailInput.setCustomValidity('メールアドレスを入力してください。');
+      }
+
+      if (!form.checkValidity()) {
+        showError('入力内容を確認してください。必須項目と形式が未入力または不正です。');
+        form.reportValidity();
+        return false;
+      }
+
+      messageInput.value = messageValue;
+      nameInput.value = nameValue;
+      emailInput.value = emailValue;
+      return true;
     };
 
     const showResult = () => {
@@ -118,22 +182,35 @@
 
     const resetForm = () => {
       form.reset();
+      clearError();
+      messageInput.setCustomValidity('');
+      nameInput.setCustomValidity('');
+      emailInput.setCustomValidity('');
       stickyWrapper.classList.remove('is-animating', 'is-hidden');
       stickyNote.style.opacity = '';
       resultCard.classList.remove('is-visible');
       setDisabled(false);
-      stickyNote.focus({ preventScroll: true });
+      messageInput.focus({ preventScroll: true });
     };
 
     const playAnimation = () => {
       stickyWrapper.classList.add('is-animating');
-      stickyNote.addEventListener('animationend', () => {
-        showResult();
-      }, { once: true });
+      stickyNote.addEventListener(
+        'animationend',
+        () => {
+          showResult();
+        },
+        { once: true }
+      );
     };
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
       setDisabled(true);
       const shouldSkip = skipAnimation.checked || prefersReducedMotion;
 
@@ -146,6 +223,7 @@
     });
 
     resetButton.addEventListener('click', resetForm);
+    resultResetButton.addEventListener('click', resetForm);
   </script>
 </body>
 </html>
