@@ -148,6 +148,11 @@
     ];
 
     const featured = ['work-01', 'work-02', 'work-03'];
+    const mobileQuery = window.matchMedia('(max-width: 767px)');
+
+    function getFeaturedIds() {
+      return mobileQuery.matches ? featured.slice(0, 2) : featured;
+    }
 
     function setState(next) {
       book.setAttribute('data-state', next);
@@ -176,7 +181,7 @@
       toSpreadBtn.style.visibility = 'hidden';
       featuredList.innerHTML = '';
 
-      featured.forEach((id) => {
+      getFeaturedIds().forEach((id) => {
         const w = works.find((x) => x.id === id);
         if (!w) return;
         const row = document.createElement('div');

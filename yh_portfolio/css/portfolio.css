@@ -263,7 +263,7 @@ body {
   position: absolute;
   top: 50%;
   left: 80%;
-  --book-closed-width: min(630px, calc(100% - 24px));
+  --book-closed-width: min(880px, calc(100% - 24px));
   --book-open-width: min(1300px, calc(100% - 24px));
   --book-height: min(630px, calc(100% - 20px));
   --book-spine-width: 40px;
@@ -954,12 +954,20 @@ body {
     }
 
     @media (max-width: 767px) {
+      .main {
+        overflow: hidden;
+      }
+
+      .book-area {
+        overflow: hidden;
+      }
+
       .book {
         top: 50%;
         left: 50%;
         --book-closed-width: min(420px, calc(100vw - 20px));
         --book-open-width: min(420px, calc(100vw - 20px));
-        --book-height: min(560px, calc(100% - 16px));
+        --book-height: min(520px, calc(100% - 8px));
         --book-spine-width: 20px;
         --cover-extra-width: 10px;
       }
