@@ -1,0 +1,13 @@
+"filename", "language", "Markdown", "HTML", "PostCSS", "comment", "blank", "total"
+"c:\academia\src\portfolio_original\README.md", "Markdown", 1, 0, 0, 0, 1, 2
+"c:\academia\src\portfolio_original\yh_portfolio\contact.html", "HTML", 0, 195, 0, 0, 35, 230
+"c:\academia\src\portfolio_original\yh_portfolio\content_editor.html", "HTML", 0, 581, 0, 0, 35, 616
+"c:\academia\src\portfolio_original\yh_portfolio\css\common.css", "PostCSS", 0, 0, 369, 5, 48, 422
+"c:\academia\src\portfolio_original\yh_portfolio\css\contact.css", "PostCSS", 0, 0, 614, 0, 81, 695
+"c:\academia\src\portfolio_original\yh_portfolio\css\portfolio.css", "PostCSS", 0, 0, 1016, 29, 141, 1186
+"c:\academia\src\portfolio_original\yh_portfolio\css\profile.css", "PostCSS", 0, 0, 184, 3, 28, 215
+"c:\academia\src\portfolio_original\yh_portfolio\css\skills.css", "PostCSS", 0, 0, 313, 0, 50, 363
+"c:\academia\src\portfolio_original\yh_portfolio\portfolio.html", "HTML", 0, 576, 0, 0, 71, 647
+"c:\academia\src\portfolio_original\yh_portfolio\profile.html", "HTML", 0, 274, 0, 0, 37, 311
+"c:\academia\src\portfolio_original\yh_portfolio\skills.html", "HTML", 0, 217, 0, 14, 26, 257
+"Total", "-", 1, 1843, 2496, 51, 553, 4944
