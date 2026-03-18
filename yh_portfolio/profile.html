@@ -29,11 +29,11 @@
     <main class="main profile-page__main" role="main">
       <div class="donut-area">
         <div class="instruction" id="instruction">
-          <pre>クリックして選択</pre>
+          <pre id="instructionLead">クリックして選択</pre>
           <strong class="instruction-name" id="instructionName">
             <pre>Yobibit</pre>
           </strong>
-          <span>
+          <span id="instructionSub">
             <pre>リングからセクションを選んでね</pre>
           </span>
         </div>
@@ -75,7 +75,9 @@
     const svg = document.querySelector('.donut');
     const donutArea = document.querySelector('.donut-area');
     const instruction = document.getElementById('instruction');
+    const instructionLead = document.getElementById('instructionLead');
     const instructionName = document.getElementById('instructionName');
+    const instructionSub = document.getElementById('instructionSub');
     const panel = document.getElementById('panel');
     const panelTitle = document.getElementById('panelTitle');
     const panelList = document.getElementById('panelList');
@@ -296,11 +298,13 @@
       let nameSize = Math.max(10, Math.min(28, Math.floor(instructionSize * 0.19)));
       let subSize = Math.max(6, Math.min(16, Math.floor(instructionSize * 0.11)));
       let gapSize = Math.max(1, Math.min(8, Math.floor(instructionSize * 0.05)));
+      let hideLead = side <= 280;
       const applyInstructionTypography = () => {
         donutArea.style.setProperty('--instruction-title-size', `${titleSize}px`);
         donutArea.style.setProperty('--instruction-name-size', `${nameSize}px`);
         donutArea.style.setProperty('--instruction-sub-size', `${subSize}px`);
         donutArea.style.setProperty('--instruction-gap', `${gapSize}px`);
+        instructionLead.hidden = hideLead;
       };
 
       applyInstructionTypography();
@@ -311,10 +315,12 @@
         guard < 20 &&
         (instruction.scrollHeight > instruction.clientHeight || instruction.scrollWidth > instruction.clientWidth)
       ) {
-        if (titleSize > 7) {
-          titleSize -= 1;
-        } else if (subSize > 5) {
+        if (subSize > 5) {
           subSize -= 1;
+        } else if (!hideLead) {
+          hideLead = true;
+        } else if (titleSize > 7) {
+          titleSize -= 1;
         } else if (gapSize > 0) {
           gapSize -= 1;
         } else if (nameSize > 8) {

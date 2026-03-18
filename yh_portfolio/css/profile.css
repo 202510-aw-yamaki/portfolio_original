@@ -74,6 +74,12 @@
   white-space: pre-wrap;
 }
 
+.instruction > pre {
+  font-size: var(--instruction-title-size, 14px);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
 .instruction strong {
   margin: 0;
   font-size: var(--instruction-title-size, 14px);
