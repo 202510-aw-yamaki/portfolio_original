@@ -286,6 +286,24 @@
     const jsonFileInput = document.getElementById('jsonFileInput');
     const saveJsonBtn = document.getElementById('saveJsonBtn');
     const jsonPreview = document.getElementById('jsonPreview');
+    const profileBackLink = document.querySelector('.header-link');
+    let isDirty = false;
+    let suppressDirtyTracking = false;
+
+    function setDirty(next) {
+      isDirty = next;
+    }
+
+    function markDirtyAndRefresh() {
+      if (suppressDirtyTracking) return;
+      setDirty(true);
+      generateJson();
+    }
+
+    function confirmDiscardIfDirty() {
+      if (!isDirty) return true;
+      return window.confirm('保存していない入力内容があります。保存せずにページを離れますか？');
+    }
 
     function createProfileSection(section) {
       const wrap = document.createElement('div');
@@ -409,17 +427,20 @@
       if (count >= 6) return;
       workList.appendChild(createWorkGroup(count));
       refreshStarNames();
+      markDirtyAndRefresh();
     }
 
     function addCert() {
       const count = certList.querySelectorAll('[data-type="cert"]').length;
       certList.appendChild(createCertGroup(count));
+      markDirtyAndRefresh();
     }
 
     function addTool() {
       const count = toolList.querySelectorAll('[data-type="tool"]').length;
       toolList.appendChild(createToolGroup(count));
       refreshStarNames();
+      markDirtyAndRefresh();
     }
 
     function collectProfile() {
@@ -518,6 +539,7 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setDirty(false);
     }
 
     function refreshStarNames() {
@@ -610,11 +632,14 @@
     }
 
     function loadJsonObject(data) {
+      suppressDirtyTracking = true;
       fillProfile(data?.profile?.sections);
       fillWorks(data?.portfolio?.works);
       fillCerts(data?.skills?.certs);
       fillTools(data?.skills?.tools);
       generateJson();
+      suppressDirtyTracking = false;
+      setDirty(false);
     }
 
     function handleJsonFile(file) {
@@ -646,7 +671,19 @@
     loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
     jsonFileInput.addEventListener('change', (e) => handleJsonFile(e.target.files[0]));
     saveJsonBtn.addEventListener('click', downloadJson);
+    document.addEventListener('input', markDirtyAndRefresh);
+    document.addEventListener('change', markDirtyAndRefresh);
+    profileBackLink.addEventListener('click', (e) => {
+      if (confirmDiscardIfDirty()) return;
+      e.preventDefault();
+    });
+    window.addEventListener('beforeunload', (e) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    });
     generateJson();
+    setDirty(false);
   </script>
 </body>
 </html>
