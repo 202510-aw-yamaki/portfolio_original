@@ -25,9 +25,34 @@
       padding: 20px 24px;
       background: #efe8dc;
       border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
     }
     header h1 { margin: 0 0 6px; font-size: 20px; }
     header p { margin: 0; color: var(--muted); font-size: 14px; }
+    .header-copy {
+      min-width: 0;
+    }
+    .header-link {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: #fff;
+      white-space: nowrap;
+    }
+    .header-link:hover,
+    .header-link:focus-visible {
+      background: #f8ede4;
+    }
     main {
       max-width: 1100px;
       margin: 0 auto;
@@ -121,12 +146,24 @@
       font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       font-size: 12px;
     }
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-link {
+        align-self: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>ポートフォリオ用テキスト入力エディタ</h1>
-    <p>入力後に「JSON保存」で <code>content.json</code> をダウンロードしてください。保存したJSONを <code>yh_portfolio</code> 直下に配置すると各ページに反映されます。</p>
+    <div class="header-copy">
+      <h1>ポートフォリオ用テキスト入力エディタ</h1>
+      <p>入力後に「JSON保存」で <code>content.json</code> をダウンロードしてください。保存したJSONを <code>yh_portfolio</code> 直下に配置すると各ページに反映されます。</p>
+    </div>
+    <a class="header-link" href="profile.html">profileページに戻る</a>
   </header>
 
   <main>
