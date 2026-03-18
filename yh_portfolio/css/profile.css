@@ -68,11 +68,24 @@
   overflow: hidden;
 }
 
+.instruction pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+}
+
 .instruction strong {
   margin: 0;
   font-size: var(--instruction-title-size, 14px);
   line-height: 1.1;
   letter-spacing: 0;
+}
+
+.instruction-name {
+  max-width: 100%;
+  font-size: var(--instruction-name-size, 16px);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
 }
 
 .instruction span {

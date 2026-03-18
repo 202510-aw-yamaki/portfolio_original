@@ -32,6 +32,9 @@
           <strong>
             <pre>クリックして選択</pre>
           </strong>
+          <strong class="instruction-name" id="instructionName">
+            <pre>Yobibit</pre>
+          </strong>
           <span>
             <pre>リングからセクションを選んでね</pre>
           </span>
@@ -74,6 +77,7 @@
     const svg = document.querySelector('.donut');
     const donutArea = document.querySelector('.donut-area');
     const instruction = document.getElementById('instruction');
+    const instructionName = document.getElementById('instructionName');
     const panel = document.getElementById('panel');
     const panelTitle = document.getElementById('panelTitle');
     const panelList = document.getElementById('panelList');
@@ -82,6 +86,7 @@
     const dim = document.getElementById('dim');
 
     const DATA_URL = 'content.json';
+    const DEFAULT_DISPLAY_NAME = 'Yobibit';
     const DEFAULT_SECTIONS = [
       {
         key: '概要',
@@ -116,6 +121,7 @@
         note: '働き方は柔軟に相談可能です。'
       }
     ];
+    let displayName = DEFAULT_DISPLAY_NAME;
     let sections = DEFAULT_SECTIONS;
 
     const colors = ['#ffd9b3', '#ffbe9f', '#ffc79c', '#ffb782', '#ffc499', '#ffcf9f'];
@@ -205,14 +211,26 @@
       });
     }
 
+    function normalizeDisplayName(rawName) {
+      if (typeof rawName !== 'string') return DEFAULT_DISPLAY_NAME;
+      const normalized = rawName.trim();
+      return normalized || DEFAULT_DISPLAY_NAME;
+    }
+
+    function renderDisplayName() {
+      instructionName.querySelector('pre').textContent = displayName;
+    }
+
     async function loadProfileData() {
       try {
         const res = await fetch(DATA_URL, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to load content.json');
         const data = await res.json();
+        displayName = normalizeDisplayName(data?.profile?.displayName);
         const normalized = normalizeProfileSections(data?.profile?.sections);
         if (normalized) sections = normalized;
       } catch (e) {
+        displayName = DEFAULT_DISPLAY_NAME;
         sections = DEFAULT_SECTIONS;
       }
     }
@@ -277,10 +295,12 @@
       const instructionSize = Math.min(Math.floor(side * 0.6), Math.max(72, Math.floor(side * 0.4)));
       donutArea.style.setProperty('--instruction-size', `${Math.min(instructionSize, side)}px`);
       let titleSize = Math.max(8, Math.min(24, Math.floor(instructionSize * 0.16)));
+      let nameSize = Math.max(10, Math.min(28, Math.floor(instructionSize * 0.19)));
       let subSize = Math.max(6, Math.min(16, Math.floor(instructionSize * 0.11)));
       let gapSize = Math.max(1, Math.min(8, Math.floor(instructionSize * 0.05)));
       const applyInstructionTypography = () => {
         donutArea.style.setProperty('--instruction-title-size', `${titleSize}px`);
+        donutArea.style.setProperty('--instruction-name-size', `${nameSize}px`);
         donutArea.style.setProperty('--instruction-sub-size', `${subSize}px`);
         donutArea.style.setProperty('--instruction-gap', `${gapSize}px`);
       };
@@ -294,16 +314,18 @@
         (instruction.scrollHeight > instruction.clientHeight || instruction.scrollWidth > instruction.clientWidth)
       ) {
         titleSize = Math.max(7, titleSize - 1);
+        nameSize = Math.max(8, nameSize - 1);
         subSize = Math.max(5, subSize - 1);
         gapSize = Math.max(0, gapSize - 1);
         applyInstructionTypography();
         guard += 1;
-        if (titleSize === 7 && subSize === 5 && gapSize === 0) break;
+        if (titleSize === 7 && nameSize === 8 && subSize === 5 && gapSize === 0) break;
       }
     };
 
     async function init() {
       await loadProfileData();
+      renderDisplayName();
       createDonut();
       fitDonutToMain();
     }

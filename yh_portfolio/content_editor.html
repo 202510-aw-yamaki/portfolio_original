@@ -169,6 +169,11 @@
   <main>
     <section class="panel" id="profilePanel">
       <h2>1. プロフィール</h2>
+      <div class="group">
+        <h3>トップページ表示名</h3>
+        <label for="displayNameInput">中央に表示する名前</label>
+        <input type="text" id="displayNameInput" placeholder="例）山田 太郎" />
+      </div>
       <div id="profileSections"></div>
     </section>
 
@@ -286,6 +291,7 @@
     const jsonFileInput = document.getElementById('jsonFileInput');
     const saveJsonBtn = document.getElementById('saveJsonBtn');
     const jsonPreview = document.getElementById('jsonPreview');
+    const displayNameInput = document.getElementById('displayNameInput');
     const profileBackLink = document.querySelector('.header-link');
     let isDirty = false;
     let suppressDirtyTracking = false;
@@ -444,12 +450,15 @@
     }
 
     function collectProfile() {
-      return PROFILE_KEYS.map((section) => {
+      return {
+        displayName: displayNameInput.value.trim(),
+        sections: PROFILE_KEYS.map((section) => {
         const el = profileSections.querySelector(`[data-key="${section.key}"]`);
         const rows = Array.from(el.querySelectorAll('input[data-row]')).map((input) => input.value.trim());
         const note = el.querySelector('[data-note]').value.trim();
         return { key: section.key, rows, note };
-      });
+        })
+      };
     }
 
     function collectWorks() {
@@ -512,8 +521,9 @@
 
     function generateJson() {
       const works = collectWorks();
+      const profile = collectProfile();
       const data = {
-        profile: { sections: collectProfile() },
+        profile,
         portfolio: {
           works,
           featured: works.slice(0, 3).map((w) => w.id)
@@ -550,7 +560,10 @@
       });
     }
 
-    function fillProfile(sections) {
+    function fillProfile(profile) {
+      if (!profile) return;
+      displayNameInput.value = typeof profile.displayName === 'string' ? profile.displayName : '';
+      const sections = profile.sections;
       if (!Array.isArray(sections)) return;
       sections.forEach((sec) => {
         const wrap = profileSections.querySelector(`[data-key="${sec.key}"]`);
@@ -633,7 +646,7 @@
 
     function loadJsonObject(data) {
       suppressDirtyTracking = true;
-      fillProfile(data?.profile?.sections);
+      fillProfile(data?.profile);
       fillWorks(data?.portfolio?.works);
       fillCerts(data?.skills?.certs);
       fillTools(data?.skills?.tools);
