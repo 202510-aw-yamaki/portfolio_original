@@ -47,7 +47,7 @@
 
 .scene {
   flex: 1;
-  min-height: 0;
+  min-height: 300px;
   position: relative;
   overflow: hidden;
   border-radius: 18px;

@@ -125,7 +125,7 @@
 .board-inner {
   width: 100%;
   height: 100%;
-  min-height: 0;
+  min-height: 300px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: 1fr;
@@ -157,6 +157,35 @@
 .area.tool {
   border: 2px solid rgba(242, 201, 76, 0.98);
   background: rgba(255, 255, 255, 0.22);
+}
+
+.area.cert,
+.area.tool {
+  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(255, 255, 255, 0.18);
+  scrollbar-width: thin;
+}
+
+.area.cert::-webkit-scrollbar,
+.area.tool::-webkit-scrollbar {
+  width: 12px;
+}
+
+.area.cert::-webkit-scrollbar-track,
+.area.tool::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.area.cert::-webkit-scrollbar-thumb,
+.area.tool::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 236, 224, 0.88));
+  border: 2px solid rgba(185, 122, 74, 0.18);
+  border-radius: 999px;
+}
+
+.area.cert::-webkit-scrollbar-thumb:hover,
+.area.tool::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(255, 243, 232, 0.94));
 }
 
 .paper {
