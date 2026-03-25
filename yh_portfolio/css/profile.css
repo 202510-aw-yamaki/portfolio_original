@@ -253,3 +253,9 @@
   }
 }
 
+@media (max-height: 820px) {
+  #instructionLead {
+    display: none;
+  }
+}
+
