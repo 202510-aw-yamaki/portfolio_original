@@ -155,7 +155,6 @@ nav a[aria-current="page"],
   color: var(--deep-orange);
 }
 
-.bottom-bar,
 .site__footer {
   height: auto; min-height: 170px;
   flex: 0 0 auto;
@@ -169,7 +168,6 @@ nav a[aria-current="page"],
   border-top: 1px solid rgba(120, 70, 30, 0.12);
 }
 
-.bottom-buttons,
 .site__footer-nav {
   width: 100%;
   padding: 0 32px;
@@ -178,7 +176,6 @@ nav a[aria-current="page"],
   gap: 14px;
 }
 
-.footer-meta,
 .site__footer-meta {
   position: relative;
   display: flex;
@@ -188,7 +185,6 @@ nav a[aria-current="page"],
   padding: 2px 16px 0;
 }
 
-.footer-meta-menu,
 .site__footer-meta-menu {
   position: absolute;
   left: 16px;
@@ -198,7 +194,6 @@ nav a[aria-current="page"],
   display: none;
 }
 
-.footer-menu-toggle,
 .site__footer-menu-toggle {
   list-style: none;
   width: 40px;
@@ -213,27 +208,21 @@ nav a[aria-current="page"],
   box-shadow: 0 8px 16px rgba(120, 70, 30, 0.12);
 }
 
-.footer-menu-toggle::-webkit-details-marker,
 .site__footer-menu-toggle::-webkit-details-marker {
   display: none;
 }
 
-.footer-menu-toggle:focus-visible,
 .site__footer-menu-toggle:focus-visible {
   outline: 2px solid rgba(240, 124, 44, 0.55);
   outline-offset: 2px;
 }
 
-.footer-menu-icon,
 .site__footer-menu-icon {
   position: relative;
   width: 18px;
   height: 12px;
 }
 
-.footer-menu-icon::before,
-.footer-menu-icon::after,
-.footer-menu-icon span,
 .site__footer-menu-icon::before,
 .site__footer-menu-icon::after,
 .site__footer-menu-icon span {
@@ -246,22 +235,18 @@ nav a[aria-current="page"],
   background: var(--text-main);
 }
 
-.footer-menu-icon::before,
 .site__footer-menu-icon::before {
   top: 0;
 }
 
-.footer-menu-icon span,
 .site__footer-menu-icon span {
   top: 5px;
 }
 
-.footer-menu-icon::after,
 .site__footer-menu-icon::after {
   bottom: 0;
 }
 
-.footer-menu-panel,
 .site__footer-menu-panel {
   position: absolute;
   left: 0;
@@ -277,7 +262,6 @@ nav a[aria-current="page"],
   gap: 8px;
 }
 
-.footer-menu-link,
 .site__footer-menu-link {
   display: block;
   padding: 10px 12px;
@@ -289,21 +273,16 @@ nav a[aria-current="page"],
   background: rgba(255, 255, 255, 0.8);
 }
 
-.footer-menu-link:hover,
-.site__footer-menu-link:hover,
-.footer-menu-link:focus-visible,
 .site__footer-menu-link:focus-visible {
   background: rgba(240, 124, 44, 0.12);
   color: var(--deep-orange);
   outline: none;
 }
 
-.footer-menu-link.is-current,
 .site__footer-menu-link.is-current {
   display: none;
 }
 
-.footer-meta-center,
 .site__footer-meta-center {
   position: absolute;
   left: 50%;
@@ -317,7 +296,6 @@ nav a[aria-current="page"],
   text-align: center;
 }
 
-.footer-card,
 .site__footer-card {
   min-height: 24px;
   display: flex;
@@ -339,21 +317,18 @@ nav a[aria-current="page"],
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.footer-card:hover,
 .site__footer-card:hover,
-.footer-card:focus-visible {
+.site__footer-card:focus-visible {
   transform: translateY(-1px);
   box-shadow: var(--btn-shadow-hover);
   outline: none;
 }
 
-.footer-card:active,
 .site__footer-card:active {
   transform: translateY(0);
   box-shadow: var(--btn-shadow-active);
 }
 
-.footer-card.is-current,
 .site__footer-card.is-current {
   display: none;
   pointer-events: none;
@@ -367,7 +342,6 @@ nav a[aria-current="page"],
   letter-spacing: 0.2px;
 }
 
-.footer-meta-link,
 .site__footer-meta-link {
   text-align: center;
   font-size: 13px;
@@ -377,9 +351,6 @@ nav a[aria-current="page"],
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 
-.footer-meta-link:hover,
-.site__footer-meta-link:hover,
-.footer-meta-link:focus-visible,
 .site__footer-meta-link:focus-visible {
   color: #c5621d;
   opacity: 0.9;
@@ -571,7 +542,6 @@ nav a[aria-current="page"],
     font-size: 12px;
   }
 
-  .footer-meta,
   .site__footer-meta {
     min-height: 44px;
     padding-top: 0;
@@ -581,29 +551,24 @@ nav a[aria-current="page"],
     font-size: 12px;
   }
 
-  .footer-meta-link,
   .site__footer-meta-link {
     font-size: 12px;
   }
 
-  .footer-meta-menu,
   .site__footer-meta-menu {
     left: 12px;
   }
 
-  .footer-menu-panel,
   .site__footer-menu-panel {
     min-width: 190px;
   }
 }
 
 @media (min-width: 768px) {
-  .bottom-buttons,
   .site__footer-nav {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .footer-meta,
   .site__footer-meta {
     padding: 2px 32px 0;
   }
@@ -620,7 +585,6 @@ nav a[aria-current="page"],
     display: none;
   }
 
-  .footer-meta-menu,
   .site__footer-meta-menu {
     display: block;
   }
