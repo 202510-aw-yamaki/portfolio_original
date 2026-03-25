@@ -180,12 +180,141 @@ nav a[aria-current="page"],
 
 .footer-meta,
 .site__footer-meta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 2px 16px 0;
+}
+
+.footer-meta-menu,
+.site__footer-meta-menu {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: none;
+}
+
+.footer-menu-toggle,
+.site__footer-menu-toggle {
+  list-style: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 250, 244, 0.9);
+  border: 1px solid rgba(120, 70, 30, 0.18);
+  box-shadow: 0 8px 16px rgba(120, 70, 30, 0.12);
+}
+
+.footer-menu-toggle::-webkit-details-marker,
+.site__footer-menu-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.footer-menu-toggle:focus-visible,
+.site__footer-menu-toggle:focus-visible {
+  outline: 2px solid rgba(240, 124, 44, 0.55);
+  outline-offset: 2px;
+}
+
+.footer-menu-icon,
+.site__footer-menu-icon {
+  position: relative;
+  width: 18px;
+  height: 12px;
+}
+
+.footer-menu-icon::before,
+.footer-menu-icon::after,
+.footer-menu-icon span,
+.site__footer-menu-icon::before,
+.site__footer-menu-icon::after,
+.site__footer-menu-icon span {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text-main);
+}
+
+.footer-menu-icon::before,
+.site__footer-menu-icon::before {
+  top: 0;
+}
+
+.footer-menu-icon span,
+.site__footer-menu-icon span {
+  top: 5px;
+}
+
+.footer-menu-icon::after,
+.site__footer-menu-icon::after {
+  bottom: 0;
+}
+
+.footer-menu-panel,
+.site__footer-menu-panel {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  min-width: 220px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 250, 244, 0.98);
+  border: 1px solid rgba(120, 70, 30, 0.18);
+  box-shadow: 0 16px 28px rgba(120, 70, 30, 0.18);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.footer-menu-link,
+.site__footer-menu-link {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.footer-menu-link:hover,
+.site__footer-menu-link:hover,
+.footer-menu-link:focus-visible,
+.site__footer-menu-link:focus-visible {
+  background: rgba(240, 124, 44, 0.12);
+  color: var(--deep-orange);
+  outline: none;
+}
+
+.footer-menu-link.is-current,
+.site__footer-menu-link.is-current {
+  display: none;
+}
+
+.footer-meta-center,
+.site__footer-meta-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 2px 16px 0;
+  text-align: center;
 }
 
 .footer-card,
@@ -444,7 +573,7 @@ nav a[aria-current="page"],
 
   .footer-meta,
   .site__footer-meta {
-    gap: 4px;
+    min-height: 44px;
     padding-top: 0;
   }
 
@@ -456,6 +585,16 @@ nav a[aria-current="page"],
   .site__footer-meta-link {
     font-size: 12px;
   }
+
+  .footer-meta-menu,
+  .site__footer-meta-menu {
+    left: 12px;
+  }
+
+  .footer-menu-panel,
+  .site__footer-menu-panel {
+    min-width: 190px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -466,50 +605,33 @@ nav a[aria-current="page"],
 
   .footer-meta,
   .site__footer-meta {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 16px;
     padding: 2px 32px 0;
-  }
-
-  .copyright {
-    text-align: left;
-  }
-
-  .footer-meta-link,
-  .site__footer-meta-link {
-    text-align: right;
   }
 }
 
-@media (min-width: 1024px) and (max-height: 760px) {
-  .site--skills .site__footer,
-  .site--contact .site__footer {
+@media (max-height: 760px) {
+  .site__footer {
     min-height: 58px;
     gap: 0;
     padding: 4px 0 max(12px, env(safe-area-inset-bottom));
   }
 
-  .site--skills .site__footer-nav,
-  .site--contact .site__footer-nav {
+  .site__footer-nav {
     display: none;
   }
 
-  .site--skills .site__footer-meta,
-  .site--contact .site__footer-meta {
-    flex-direction: row;
-    justify-content: center;
-    gap: 14px;
+  .footer-meta-menu,
+  .site__footer-meta-menu {
+    display: block;
+  }
+
+  .site__footer-meta {
+    min-height: 40px;
     padding: 0 16px;
   }
 
-  .site--skills .copyright,
-  .site--contact .copyright {
-    font-size: 12px;
-  }
-
-  .site--skills .site__footer-meta-link,
-  .site--contact .site__footer-meta-link {
+  .copyright,
+  .site__footer-meta-link {
     font-size: 12px;
   }
 }
